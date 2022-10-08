@@ -1,0 +1,1 @@
+/home/jeff/blogging/content/ideas/esp32-walkie-talkies-via-mumble.md
