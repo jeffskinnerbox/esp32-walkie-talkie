@@ -43,12 +43,16 @@
 SHELL := /bin/bash
 
 # name of program being created
-PROG = esp32-walkie-talkie
+#PROG = esp32-walkie-talkie
+PROG = main
 
 # type of package, architecture, and board in use
-PACKAGE = esp8266
-ARCH =    esp8266
-BOARD =   nodemcuv2
+#PACKAGE = esp8266
+#ARCH =    esp8266
+#BOARD =   nodemcuv2
+PACKAGE = esp32
+ARCH =    esp32
+BOARD =   esp32
 
 # serial port used by the board
 PORT = /dev/ttyUSB0
@@ -89,7 +93,8 @@ UPLOAD_USB_FLAGS = $(VERBOSE) --fqbn $(FQBN) --port $(PORT)
 #--------------------------------- ota upload ----------------------------------
 
 # location of the espota.py used for ota flashing
-ESPOTATOOL = /home/jeff/.arduino15/packages/esp8266/hardware/esp8266/2.5.2/tools/espota.py
+#ESPOTATOOL = /home/jeff/.arduino15/packages/esp8266/hardware/esp8266/2.5.2/tools/espota.py
+ESPOTATOOL = /home/jeff/.arduino15/packages/esp32/hardware/esp32/1.0.2/tools/espota.py
 
 # set ota password, ip address, and port for device
 #OTAHOSTNAME := $(shell grep OTAHOSTNAME secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
