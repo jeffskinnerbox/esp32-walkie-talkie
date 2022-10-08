@@ -60,9 +60,9 @@ htmlcov/
 nosetests.xml
 coverage.xml
 
-### Files containing secrets
-secret*
-secrets*
+### Include files containing secrets
+secret.h
+secrets.h
 
 ### Logs & Databases ###
 *.log
