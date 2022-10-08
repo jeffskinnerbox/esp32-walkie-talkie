@@ -69,7 +69,7 @@ void Application::begin()
   // bring up WiFi
   WiFi.mode(WIFI_STA);
 #ifndef USE_ESP_NOW
-  WiFi.begin(WIFI_SSID, WIFI_PSWD);
+  WiFi.begin(WIFISSID, WIFIPASS);
   if (WiFi.waitForConnectResult() != WL_CONNECTED)
   {
     Serial.println("Connection Failed! Rebooting...");

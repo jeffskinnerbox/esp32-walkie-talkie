@@ -14,7 +14,7 @@ I2SMEMSSampler::I2SMEMSSampler(
     m_raw_samples = (int32_t *)malloc(sizeof(int32_t) * raw_samples_size);
 }
 
-I2SMEMSSampler::~I2SMEMSSampler() 
+I2SMEMSSampler::~I2SMEMSSampler()
 {
   free(m_raw_samples);
 }
@@ -24,6 +24,7 @@ void I2SMEMSSampler::configureI2S()
     if (m_fixSPH0645)
     {
         // FIXES for SPH0645
+#define CONFIG_IDF_TARGET_ESP32S2 true
 #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
         REG_SET_BIT(I2S_TIMING_REG(m_i2sPort), BIT(9));
         REG_SET_BIT(I2S_CONF_REG(m_i2sPort), I2S_RX_MSB_SHIFT);

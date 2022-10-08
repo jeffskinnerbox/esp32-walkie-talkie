@@ -1,6 +1,11 @@
 
 #include "I2SOutput.h"
 
+// I added this to eliminate compiler error
+ #ifndef ESP_IDF_VERSION_VAL
+ #define ESP_IDF_VERSION_VAL(major, minor, patch) (((major) << 16) | ((minor) << 8) | (patch))
+ #endif
+
 I2SOutput::I2SOutput(i2s_port_t i2s_port, i2s_pin_config_t &i2s_pins) : Output(i2s_port), m_i2s_pins(i2s_pins)
 {
 }
