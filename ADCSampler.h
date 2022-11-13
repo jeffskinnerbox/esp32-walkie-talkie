@@ -1,6 +1,6 @@
 #pragma once
 
-#include <driver/adc.h>
+#include <driver/adc.h>   // find this using ... cd ~/.arduino15 ; findfile adc.h ; find version for esp32, esp32C3, esp32s2
 #include "I2SSampler.h"
 
 class ADCSampler : public I2SSampler

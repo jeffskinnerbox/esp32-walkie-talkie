@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 #
 # Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-# Version:      0.0.0
+# Version:      0.9.1
 #
 # USAGE
 #   To build the executable
@@ -31,7 +31,7 @@
 #       $$ if you want a dollar sign to appear in your recipe, you must double it (‘$$’)
 #
 # SOURCES
-#   The Makefile was created with the help of this website and others:
+#   The Makefile was created with the help of this website:
 #   https://learn.sparkfun.com/tutorials/efficient-arduino-programming-with-arduino-cli-and-visual-studio-code/all
 #
 # DOCUMENTATION
@@ -43,16 +43,12 @@
 SHELL := /bin/bash
 
 # name of program being created
-#PROG = esp32-walkie-talkie
-PROG = main
+PROG = esp32-walkie-talkie
 
 # type of package, architecture, and board in use
-#PACKAGE = esp8266
-#ARCH =    esp8266
-#BOARD =   nodemcuv2
 PACKAGE = esp32
 ARCH =    esp32
-BOARD =   esp32
+BOARD =   nodemcu-32s
 
 # serial port used by the board
 PORT = /dev/ttyUSB0
@@ -88,23 +84,22 @@ CC_FLAGS = $(VERBOSE) --fqbn $(FQBN) --build-path=$(BUILD_PATH) --build-cache-pa
 
 # usb firmware flasher and flags
 UPLOAD_USB = arduino-cli upload
-UPLOAD_USB_FLAGS = $(VERBOSE) --fqbn $(FQBN) --port $(PORT)
+UPLOAD_USB_FLAGS = $(VERBOSE) --fqbn $(FQBN) --port $(PORT) --input-dir $(BUILD_PATH)
 
 #--------------------------------- ota upload ----------------------------------
 
 # location of the espota.py used for ota flashing
-#ESPOTATOOL = /home/jeff/.arduino15/packages/esp8266/hardware/esp8266/2.5.2/tools/espota.py
-ESPOTATOOL = /home/jeff/.arduino15/packages/esp32/hardware/esp32/1.0.2/tools/espota.py
+ESPOTATOOL = /home/jeff/.arduino15/packages/esp8266/hardware/esp8266/2.5.2/tools/espota.py
 
 # set ota password, ip address, and port for device
-#OTAHOSTNAME := $(shell grep OTAHOSTNAME secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
-#OTAPASS := $(shell grep OTAPASSWORD secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
-#OTAPORT := $(shell grep OTAPORT secrets.h | cut -d" " -f3)
-#OTAIP := $(shell ping -c1 $(OTAHOSTNAME).local | grep "bytes from" | cut -d " " -f5 | awk '{ print substr($$0, 2) }' | awk '{ print substr( $$0, 1, length($$0)-2 ) }')
+OTAHOSTNAME := $(shell grep OTAHOSTNAME secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
+OTAPASS := $(shell grep OTAPASSWORD secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
+OTAPORT := $(shell grep OTAPORT secrets.h | cut -d" " -f3)
+OTAIP := $(shell ping -c1 $(OTAHOSTNAME).local | grep "bytes from" | cut -d " " -f5 | awk '{ print substr($$0, 2) }' | awk '{ print substr( $$0, 1, length($$0)-2 ) }')
 
 # ota firmware flasher and flags
-#UPLOAD_OTA = python2 $(ESPOTATOOL)
-#UPLOAD_OTA_FLAGS = -d -i $(OTAIP) -p $(OTAPORT) -a $(OTAPASS) -f $(PROG).$(VAR).bin
+UPLOAD_OTA = python2 $(ESPOTATOOL)
+UPLOAD_OTA_FLAGS = -d -i $(OTAIP) -p $(OTAPORT) -a $(OTAPASS) -f $(PROG).$(VAR).bin
 
 #-------------------------------------------------------------------------------
 
@@ -139,18 +134,18 @@ build:                                          # build the binary executable
 	$(CC) $(CC_FLAGS) $(CURDIR)
 
 upload:                                         # flash the binary executable via usb
-	$(UPLOAD_USB) $(UPLOAD_USB_FLAGS) $(CURDIR)
+	$(UPLOAD_USB) $(UPLOAD_USB_FLAGS) $(DURDIR)
 
-#upload-ota:                                     # flash the binary executable via ota
-#	@echo VAR = $(VAR)
-#	@echo OTAIP = $(OTAIP)
-#	@echo OTAPASS = $(OTAPASS)
-#	@echo OTAPORT = $(OTAPORT)
-#	@echo OTAHOSTNAME = $(OTAHOSTNAME)
-#	@echo UPLOAD_OTA_FLAGS = $(UPLOAD_OTA_FLAGS)
-#	$(CURDIR)/answerbot $(OTAIP) 23             # using telnet, reboot the device to do OTA
-#	sleep 10                                    # wait until device is ready for OTA start
-#	$(UPLOAD_OTA) $(UPLOAD_OTA_FLAGS)
+upload-ota:                                     # flash the binary executable via ota
+	@echo VAR = $(VAR)
+	@echo OTAIP = $(OTAIP)
+	@echo OTAPASS = $(OTAPASS)
+	@echo OTAPORT = $(OTAPORT)
+	@echo OTAHOSTNAME = $(OTAHOSTNAME)
+	@echo UPLOAD_OTA_FLAGS = $(UPLOAD_OTA_FLAGS)
+	$(CURDIR)/answerbot $(OTAIP) 23             # using telnet, reboot the device to do OTA
+	sleep 10                                    # wait until device is ready for OTA start
+	$(UPLOAD_OTA) $(UPLOAD_OTA_FLAGS)
 
 erase:                                          # erase the entire flash
 	$(ESPTOOL) erase_flash --port $(PORT)
@@ -159,6 +154,5 @@ size:                                           # determine the flash size
 	$(ESPTOOL) flash_id --port $(PORT)
 
 clean:                                          # delete all binaries and object files
-	rm -r --force $(BUILD)
-	rm --force *.bin *.elf *.hex
+	rm -r --force $(BUILD) *.bin *.elf *.hex
 
