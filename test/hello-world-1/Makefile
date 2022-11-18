@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 #
 # Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-# Version:      0.9.1
+# Version:      0.9.2
 #
 # USAGE
 #   To build the executable
