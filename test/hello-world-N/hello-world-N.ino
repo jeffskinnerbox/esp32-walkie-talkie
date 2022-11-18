@@ -90,13 +90,12 @@ CREATED BY:
 
 // this project's include files
 #include "DeBug.h"
-#include "Application.h"
 
 
 //---------------------------- Static Scoped Macros ----------------------------
 
 // version stamp
-#define VER "esp32-walkie-talkie" " - "  __DATE__ " at " __TIME__
+#define VER "hello-world-N" " - "  __DATE__ " at " __TIME__
 static char version[] = VER;
 
 
@@ -109,8 +108,6 @@ extern DeBug DB;         // declare object DB as external, and member of class D
 //WiFiHandler WT = WiFiHandler();
 //MQTTHandler handlerMQTT = MQTTHandler(mqtt_server, mqtt_port);
 
-// creation of the application
-Application *application;
 
 
 
@@ -128,9 +125,6 @@ void setup() {
     DEBUGSTATUS();                                       // provide information about debug status flags
     DEBUGINFO();                                         // provide some useful information about the microprocessor
 
-    // start up the application
-    //application = new Application();
-    //application->begin();
     Serial.println("Application started");
 
     DEBUGTRACE(INFO, "------------------------------- Entering loop() --------------------------------");
@@ -143,7 +137,5 @@ void loop() {
     DEBUGLOOP();
     //OTA.loopOTA();
 
-    // nothing to do - the application initiated in setup() is doing all the work
-    //vTaskDelay(pdMS_TO_TICKS(1000));
 }
 

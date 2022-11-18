@@ -43,7 +43,7 @@
 SHELL := /bin/bash
 
 # name of program being created
-PROG = esp32-walkie-talkie
+PROG = hello-world-4
 
 # type of package, architecture, and board in use
 PACKAGE = esp32

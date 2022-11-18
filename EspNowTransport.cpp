@@ -14,9 +14,9 @@ void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen)
 {
   // annoyingly we can't pass an param into this so we need to do a bit of hack to access the EspNowTransport instance
   int header_size = instance->m_header_size;
-  
+
   // first m_header_size bytes of m_buffer are the expected header
-  if ((dataLen > header_size) && (dataLen<=MAX_ESP_NOW_PACKET_SIZE) && (memcmp(data,instance->m_buffer,header_size) == 0)) 
+  if ((dataLen > header_size) && (dataLen<=MAX_ESP_NOW_PACKET_SIZE) && (memcmp(data,instance->m_buffer,header_size) == 0))
   {
     instance->m_output_buffer->add_samples(data + header_size, dataLen - header_size);
   }
@@ -28,7 +28,7 @@ bool EspNowTransport::begin()
   esp_wifi_set_promiscuous(true);
   esp_wifi_set_channel(m_wifi_channel, WIFI_SECOND_CHAN_NONE);
   esp_wifi_set_promiscuous(false);
-  
+
   esp_err_t result = esp_now_init();
   if (result == ESP_OK)
   {
@@ -57,7 +57,7 @@ bool EspNowTransport::begin()
 
 EspNowTransport::EspNowTransport(OutputBuffer *output_buffer, uint8_t wifi_channel) : Transport(output_buffer, MAX_ESP_NOW_PACKET_SIZE)
 {
-  instance = this;  
+  instance = this;
   m_wifi_channel = wifi_channel;
 }
 

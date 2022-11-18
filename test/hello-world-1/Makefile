@@ -43,7 +43,7 @@
 SHELL := /bin/bash
 
 # name of program being created
-PROG = esp32-walkie-talkie
+PROG = hello-world-1
 
 # type of package, architecture, and board in use
 PACKAGE = esp32
@@ -92,10 +92,10 @@ UPLOAD_USB_FLAGS = $(VERBOSE) --fqbn $(FQBN) --port $(PORT) --input-dir $(BUILD_
 ESPOTATOOL = /home/jeff/.arduino15/packages/esp8266/hardware/esp8266/2.5.2/tools/espota.py
 
 # set ota password, ip address, and port for device
-OTAHOSTNAME := $(shell grep OTAHOSTNAME secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
-OTAPASS := $(shell grep OTAPASSWORD secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
-OTAPORT := $(shell grep OTAPORT secrets.h | cut -d" " -f3)
-OTAIP := $(shell ping -c1 $(OTAHOSTNAME).local | grep "bytes from" | cut -d " " -f5 | awk '{ print substr($$0, 2) }' | awk '{ print substr( $$0, 1, length($$0)-2 ) }')
+#OTAHOSTNAME := $(shell grep OTAHOSTNAME secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
+#OTAPASS := $(shell grep OTAPASSWORD secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
+#OTAPORT := $(shell grep OTAPORT secrets.h | cut -d" " -f3)
+#OTAIP := $(shell ping -c1 $(OTAHOSTNAME).local | grep "bytes from" | cut -d " " -f5 | awk '{ print substr($$0, 2) }' | awk '{ print substr( $$0, 1, length($$0)-2 ) }')
 
 # ota firmware flasher and flags
 UPLOAD_OTA = python2 $(ESPOTATOOL)
