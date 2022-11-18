@@ -197,17 +197,32 @@ void DeBug::SetupHandler(bool ser, bool tel, bool pre) {
 
 
 void DeBug::debugOnOff(bool flag) {
+
+    if (!flag)
+        traceMsg(WARN, "Serial printing is disabled");
+
     serial = flag;
+
 }
 
 
 void DeBug::telnetOnOff(bool flag) {
+
+    if (!flag)
+        traceMsg(WARN, "Telnet connectivity is disabled");
+
     telnet = flag;
+
 }
 
 
 void DeBug::preambleOnOff(bool flag) {
+
+    if (!flag)
+        traceMsg(WARN, "Preamble printing is disabled");
+
     preamble = flag;
+
 }
 
 
@@ -227,7 +242,7 @@ void DeBug::printInfo(void) {
     traceMsg(INFO, "\tESP8266 DHCP Hostname = ", WiFi.getHostname());
     traceMsg(INFO, "\tESP32 Chip ID (HEX) = %X\n\r", chipid, HEX);
 	traceMsg(INFO, "\tESP32 Chip Model = %s Rev %d\n\r", ESP.getChipModel(), ESP.getChipRevision());
-	traceMsg(INFO, "\tESP32 Chip %d cores\n\r", ESP.getChipCores());
+	traceMsg(INFO, "\tESP32 Chi Cores = %d cores\n\r", ESP.getChipCores(), DEC);
 
     //traceMsg(INFO, "\tFlash Chip Real Size (from chip): %d bits\n\r", ESP.getFlashChipRealSize(), DEC);
     traceMsg(INFO, "\tFlash Chip Size (what compiler set): %d bits\n\r", ESP.getFlashChipSize(), DEC);
