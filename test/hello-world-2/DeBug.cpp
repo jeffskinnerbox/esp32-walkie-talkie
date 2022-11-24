@@ -39,7 +39,6 @@ CREATED BY:
 #define BUF1 25
 #define BUF2 50
 
-#include <Arduino.h>          // found in ESP32 libraries (~/.arduino15/packages/esp32/hardware/esp32)
 #ifdef ESP32
 #include <WiFi.h>             // found in ESP32 libraries (~/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/sdk)
 #else
@@ -540,7 +539,7 @@ template void DeBug::traceMsg<unsigned char, int>(int, char*, unsigned char, int
 template void DeBug::traceMsg<char*, char const*>(int, char*, char*, char const*);
 template void DeBug::traceMsg<char const*, char*>(int, char*, char const*, char*);
 
-template void DeBug::traceMsg<StringSumHelper>(int, char*, StringSumHelper);
+//template void DeBug::traceMsg<StringSumHelper>(int, char*, StringSumHelper);
 //template void DeBug::traceMsg(int, char*, T) [with T = char* (*)(const char*, int)];
 //template void DeBug::traceMsg<char* (*)(char const*, int)>(int, char*, char* (*)(char const*, int));
 

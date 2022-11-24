@@ -1,0 +1,33 @@
+#!/usr/bin/expect -f
+
+#-------------------------------------------------------------------------------
+#
+# Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
+# Version:      0.9.1
+#
+# DESCRIPTION:
+#   This script is used to telnet into the device and cause it to reboot.
+#   Once the boot is complete, the device goes into OTA-enabled state,
+#   allowing you to uplad new firmware.
+#
+# SOURCES:
+#   https://www.youtube.com/watch?v=1pwqS_NUG7Q
+#
+# DOCUMENTATION:
+#   https://likegeeks.com/expect-command/
+#
+#-------------------------------------------------------------------------------
+
+# grab the arguments off the command-line of this script
+set timeout 5;                # timeout after 5 seconds if you get no dialog
+set ip [lindex $argv 0];      # grab first argument
+set port [lindex $argv 1];    # grab second argument
+
+# begin your interaction
+spawn telnet $ip $port;       # startup telnet
+expect "\'^]\'.";             # wait for the characters "'^]'."
+send "R\r";                   # send 'R' to request reboot
+
+# let the connection drop
+interact
+

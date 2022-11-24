@@ -6,7 +6,7 @@ Version:      0.9.5
 DESCRIPTION:
 
 PHYSICAL DESIGN:
-    Just ESP8266, nothing else required
+    Just ESP8266 or ESP32 board, nothing else required
 
 MONITOR:
     For full monitoring, make sure serial = true and telnet = true when you
@@ -14,7 +14,6 @@ MONITOR:
 
     sudo arp-scan 192.168.1.0/24 | grep Espressif
     sudo netdiscover -c 3 -s 10 -L -N -r 192.168.1.0/24 | grep Espressif
-    nslookup 192.168.1.44
 
     screen /dev/ttyUSB0 9600,cs8cls
 
@@ -38,13 +37,12 @@ CREATED BY:
 
 #define TDEBUG  false         // should we activate trace message printing for debugging
 
-#define BUF1 25
-#define BUF2 50
+#define BUFFER 50
 
-#ifdef ESP32
-#include <WiFi.h>             // found in ESP32 libraries (~/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/sdk)
-#else
-#include <ESP8266WiFi.h>      // found in ESP8266 libraries (~/.arduino15/packages/esp8266)
+#ifdef ESP32                  // found in ESP32 libraries (~/.arduino15/packages/esp32/)
+#include <WiFi.h>
+#else                         // found in ESP8266 libraries (~/.arduino15/packages/esp8266)
+#include <ESP8266WiFi.h>
 #endif
 
 // found in Arduino libraries (~/Arduino/libraries)
@@ -146,7 +144,7 @@ bool DeBug::checkWiFi(void) {
 }
 
 
-// parser the characters entered via serial or telnet and excute proper action
+// parser the characters entered via serial or telnet and execute proper action
 void DeBug::commandParser(char c) {
 
     switch (c) {
@@ -402,7 +400,7 @@ void DeBug::LoopHandler(void) {
 void DeBug::wifiScan(void) {
 
     unsigned char numSsid;
-    char buffer[BUF2];
+    char buffer[BUFFER];
     String st;
 
     traceMsg(HEADING, "---------------------------- Starting Network Scan -----------------------------");
@@ -415,7 +413,7 @@ void DeBug::wifiScan(void) {
 
     // print the list of networks seen
     traceMsg(INFO, "Total number of SSIDs found: ", numSsid);
-    snprintf(buffer, BUF2, "\t%-20s\t%s\t%s", "SSID", "RSSI", "Encryp_Type");
+    snprintf(buffer, BUFFER, "\t%-20s\t%s\t%s", "SSID", "RSSI", "Encryp_Type");
     traceMsg(INFO, buffer);
 
     // print the name and characteristics of each network found
@@ -423,19 +421,19 @@ void DeBug::wifiScan(void) {
         st = WiFi.SSID(thisNet);     // convert from sting object to character string
         switch(WiFi.encryptionType(thisNet)) {
             case 2:
-                snprintf(buffer, BUF2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "TKIP (WPA)");
+                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "TKIP (WPA)");
                 break;
             case 4:
-                snprintf(buffer, BUF2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "CCMP (WPA)");
+                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "CCMP (WPA)");
                 break;
             case 5:
-                snprintf(buffer, BUF2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "WEP");
+                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "WEP");
                 break;
             case 7:
-                snprintf(buffer, BUF2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "NONE");
+                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "NONE");
                 break;
             case 8:
-                snprintf(buffer, BUF2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "AUTO");
+                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "AUTO");
                 break;
             default:
                 traceMsg(ERROR, "Returned improper encryption type during WiFi scan.");
@@ -587,7 +585,11 @@ template void DeBug::traceMsg<unsigned char, int>(int, char*, unsigned char, int
 template void DeBug::traceMsg<char*, char const*>(int, char*, char*, char const*);
 template void DeBug::traceMsg<char const*, char*>(int, char*, char const*, char*);
 
-//template void DeBug::traceMsg<StringSumHelper>(int, char*, StringSumHelper);
+#ifdef ESP32
+template void DeBug::traceMsg<StringSumHelper>(int, char*, StringSumHelper);
+#else
+#endif
+
 //template void DeBug::traceMsg(int, char*, T) [with T = char* (*)(const char*, int)];
 //template void DeBug::traceMsg<char* (*)(char const*, int)>(int, char*, char* (*)(char const*, int));
 

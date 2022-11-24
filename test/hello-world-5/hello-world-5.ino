@@ -30,7 +30,7 @@ MONITOR:
 
         telnet ESP_24F9FB             # using esp32 hostname ('ESP_' + chip ID)
         telnet 192.168.1.109          # using esp32 ip address
-        telnet hello-world-4.local
+        telnet hello-world-5.local
 
     To terminate telnet monitoring, enter 'Ctrl-] quit'.
 
@@ -44,6 +44,26 @@ TESTING
 
     To test the OTA capabilities
 
+    For testing, you may want to "see" the ticking of the clock.  To "see the tick-tock"
+    on the serial connection, set HEARTBEAT to true.  You may also want to have more
+    frequent calls to NTP to refeash the time.  To speed up the refreashing, modify REFRESH
+    to a value like 5000UL.
+
+    To test the MQTT capabilities, use a public MQTT broker site
+    and Mosquitto clients like this:
+
+        mosquitto_sub -v -h broker.mqtt-dashboard.com -t "hello-world-5/message"
+        mosquitto_sub -v -h broker.mqtt-dashboard.com -t "hello-world-5/error"
+        mosquitto_sub -v -h broker.mqtt-dashboard.com -t "hello-world-5/#"
+
+        mosquitto_pub -h broker.mqtt-dashboard.com -t "hello-world-5/command" -m "2"
+
+USAGE
+    commands sent via MQTT:
+        '1' - turn on red LED so it blinks with the tick-tock
+        '2' - calculate drift sinse last time refresh
+        '3' - force a time refresh with NTP server
+
 REFERENCE MATERIALS:
 
 SOURCES:
@@ -56,18 +76,21 @@ CREATED BY:
 
 #define TDEBUG  true              // activate trace message printing for debugging
 
+// found in Arduino Sketchbooks libraries (~/src/arduino/sketchbooks/libraries)
+#include <PubSubClient.h>
+
 // this project's include files
 #include "DeBug.h"
 #include "configuration.h"
 #include "WiFiHandler.h"
 #include "OTAHandler.h"
+#include "MQTTHandler.h"
 
 
-
-//---------------------------- Static Scoped Macros ----------------------------
+//---------------------- Static Scoped Macros & Variables ----------------------
 
 // version stamp
-#define VER "hello-world-4" " - "  __DATE__ " at " __TIME__
+#define VER HOSTNAME " - "  __DATE__ " at " __TIME__
 static char version[] = VER;
 
 // time intervals
@@ -77,18 +100,35 @@ static char version[] = VER;
 // error codes
 #define NOWIFI        1             // can't get wifi connection
 #define UNKNMQTT      2             // error code meaning don't understand mqtt command request
+#define RESET         3             // restart the processor
+#define UNKNMQTT      4             // error code meaning don't understand mqtt command request
+
+
+
+//------------------------------- MQTT Parameters ------------------------------
+
+// MQTT message buffer for publishing and subscription
+static const int MSGSIZE = 80;                 // size of mqtt message buffer
+static char msg[MSGSIZE];                      // buffer to hold mqtt messages
 
 
 
 //-------------------------- Static Scoped Variables ---------------------------
 
-// Update these with values suitable for your wifi
+// Update these with values suitable for your wifi and mqtt broker
 static char* wifi_ssid = WIFISSID;
 static char* wifi_password = WIFIPASS;
 static unsigned long wifi_time = WIFITIME;
+static char* mqtt_server = MQTTSERVER;
+static int mqtt_port = MQTTPORT;
 
 // wifi handlers object constructor
 WiFiHandler WT = WiFiHandler();
+static MQTTHandler MQ = MQTTHandler(mqtt_server, mqtt_port);
+
+
+
+//--------------------------- Global Scoped Variables --------------------------
 
 extern DeBug DB;                  // declare object DB as external, and member of class DeBug
 extern OTAHandler OTA;            // declare object OTA as external, and member of class OTAHandler
@@ -129,6 +169,7 @@ void errorHandler(int error_code, char *msg) {
         case NOWIFI:
             DEBUGTRACE(ERROR, msg);
             DEBUGTRACE(FATAL, "An automated restart will be requested.");
+            MQ.publish(ERROR_TOPIC, msg, false);
 
             tout = ONE_MINUTE + millis();    // milliseconds of time to display message
             while (millis() < tout) {
@@ -141,14 +182,80 @@ void errorHandler(int error_code, char *msg) {
             Serial.flush();                  // make sure serial messages are posted
             ESP.restart();
             break;
+        case UNKNMQTT:
+            DEBUGTRACE(ERROR, msg);
+            MQ.publish(ERROR_TOPIC, msg, false);
+            break;
         default:
             // nothing can be done so restart
             DEBUGTRACE(ERROR, "Unknown error code in errorHandler: ", error_code);
             DEBUGTRACE(FATAL, "Nothing can be done.  Doing an automatic restart.");
+            MQ.publish(ERROR_TOPIC, "Unknown error code in errorHandler", false);
             Serial.flush();                  // make sure serial messages are posted
             ESP.restart();
     }
 }
+
+
+
+//-------------------------------- MQTT Routines -------------------------------
+
+//void SubscriptionCallback(char* topic, byte* payload, unsigned int length) {
+void SubscriptionCallback(char* topic, unsigned char* payload, unsigned int length) {
+
+    DEBUGPRINT("\r\n");
+    DEBUGTRACE(INFO, "Message arrived on topic = ", topic);
+
+    snprintf(msg, length + 1, "%s", payload);
+    DEBUGTRACE(INFO, "MQTT message = ", msg);
+
+    /*switch((char)payload[0]) {*/
+        /*case '1':          // toggle the nodemcu red LED to blinking or off*/
+            /*if (blinkLED) {*/
+                /*blinkLED = false;*/
+                /*nodemcuLED = HIGH;*/
+                /*digitalWrite(LED, nodemcuLED);   // make sure nodmcu red led is 'off'*/
+            /*} else {*/
+                /*blinkLED = true;*/
+            /*}*/
+            /*break;*/
+        /*case '2':          // write to topic how much the clock has drifted from the ntp time server*/
+            /*TimeDriftCheck();*/
+            /*break;*/
+        /*case '3':          // forced time refresh*/
+            /*TimeRefresh(NULL);*/
+            /*break;*/
+        /*default:*/
+            /*errorHandler(UNKNMQTT, "MQTT message unknown.  No action taken.");*/
+    /*}*/
+}
+
+
+/*bool MQTTPublishMsg(char *topic, char* payload) {*/
+
+    /*// if not connect to mqtt broker, then reconnect*/
+    /*if (!MQ.connected()) {*/
+        /*MQ.reconnect();*/
+    /*}*/
+
+    /*// publish message*/
+    /*MQ.publish(topic, payload, true);*/
+
+/*    // if not connect to mqtt broker, then reconnect*/
+    /*if (!MQ.connected()) {*/
+        /*MQ.reconnect();*/
+    /*}*/
+
+    /*// format message for sending*/
+    /*if (status24hour)*/
+        /*snprintf(msg, MSGSIZE, "%02d:%02d:%02d", displayHours, displayMinutes, displaySeconds);*/
+    /*else*/
+        /*snprintf(msg, MSGSIZE, "%02d:%02d:%02d%s", displayHours, displayMinutes, displaySeconds, displayAMPM);*/
+
+    /*// publish message*/
+    /*MQ.publish(TIMETOPIC, msg, true);*/
+
+/*}*/
 
 
 
@@ -178,12 +285,16 @@ void setup() {
             // any activity you want to do while waiting for wifi to come up
             yield();                     // prevent the watchdog timer doing a reboot
         }
-    } else
+        DEBUGON(true, true, false);          // turn on serial and telnet tracing
+
+        OTA.setupOTA();                      // should always follow 'DEBUGSETUP()' and after wifi is up
+        MQ.reconnect();                      // connect to mqtt broker
+
+        MQ.setServer(mqtt_server, mqtt_port); // set your mqtt broker to be used
+        MQ.setCallback(SubscriptionCallback); // set the callback for subscribe topic
+    } else {
         errorHandler(NOWIFI, "Can't go on without WiFi connection. Press reset to try again.");
-
-    DEBUGON(true, true, false);          // turn on serial and telnet tracing
-
-    OTA.setupOTA();                      // should always follow 'DEBUGSETUP()' and after wifi is up
+    }
 
     DEBUGTRACE(HEADING, "-------------------------------- Exited setup() --------------------------------");
 
@@ -196,6 +307,9 @@ void loop() {
     OTA.loopOTA();                       // place this anywhere in the loop() routine
 
     if (blinkLED(STD_BLKRATE))
-        DEBUGTRACE(INFO, "Hello World 4");
+        DEBUGTRACE(INFO, "Hello World 5");
+
+    // allow the client to process mqtt subscriptions, publish, and refresh connection
+    MQ.loop();                           // place this anywhere in the loop() routine
 
 }

@@ -15,27 +15,35 @@ CREATED BY:
 #define TDEBUG  true       // activate trace message printing for debugging
 
 
-// ESP8266 libraries (~/.arduino15/packages/esp8266)
-#include <WiFiUdp.h>
 #ifdef ESP32
-#include <WiFi.h>             // found in ESP32 libraries (~/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/sdk)
-#else
-#include <ESP8266WiFi.h>      // found in ESP8266 libraries (~/.arduino15/packages/esp8266)
+#include <WiFi.h>
+#include <WiFiUdp.h>
+#include <ESPmDNS.h>
+#include <ESPAsyncWebServer.h>
+#else                            // ESP8266 libraries (~/.arduino15/packages/esp8266)
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
+#include <ESP8266mDNS.h>
+#include <ESPAsyncWebServer.h>
 #endif
 
 // Arduino libraries (~/src/arduino/libraries)
-#include <Arduino.h>
 
 // Arduino Sketchbooks libraries (~/src/arduino/sketchbooks/libraries)
 
 // simple-display project's include files (~/src/scrolling-display/test/simple-display)
 #include "DeBug.h"
+#include "secrets.h"
 #include "WiFiHandler.h"
 
 #define BUF1 25
 #define BUF2 50
 
-extern DeBug DB;        // declare object DB as external, it is instantiated in DeBug.cpp
+extern DeBug DB;             // declare object DB as external, it is instantiated in DeBug.cpp
+
+AsyncWebServer server(80);   // create AsyncWebServer object on port 80
+
+
 
 // ------------------------ Constructors & Destructors -------------------------
 
@@ -59,7 +67,30 @@ WiFiHandler::~WiFiHandler(void) {
 
 
 
-//-------------------------------- WiFi Methods --------------------------------
+//------------------------------ Private Methods -------------------------------
+
+bool WiFiHandler::mDNSservices(void) {
+
+    if(!MDNS.begin(HOSTNAME)) {
+        DEBUGTRACE(ERROR, "Error encountered while starting mDNS");
+        return false;
+    }
+
+    // route for '/hello' web page
+    server.on("/hello", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(200, "text/plain", "Hello World");
+    });
+
+    // start the esp web server
+    server.begin();
+
+    return true;
+
+}
+
+
+
+//------------------------------- Public Methods -------------------------------
 
 // connect to wifi
 bool WiFiHandler::wifiConnect(char *id, char *pass, unsigned long tout) {
@@ -68,10 +99,12 @@ bool WiFiHandler::wifiConnect(char *id, char *pass, unsigned long tout) {
     password = pass;
     timeout = tout;
 
+    DEBUGTRACE(HEADING, "---------------------------- Entered wifiConnect() -----------------------------");
+
     // attempt first connect to a WiFi network
     DEBUGTRACE(INFO, "Attempting connection to WiFi SSID ", ssid);
     WiFi.begin(ssid, password);
-    WiFi.mode(WIFI_STA);                      // ESP-32 as client
+    WiFi.mode(WIFI_STA);                      // ESP-32 as wifi client / Station Mode (STA)
 
     // make subsequent connection attempts to wifi
     tout = timeout + millis();                // milliseconds of time given to making connection attempt
@@ -89,17 +122,21 @@ bool WiFiHandler::wifiConnect(char *id, char *pass, unsigned long tout) {
     DEBUGTRACE(INFO, "Successfully connected to WiFi!  IP address is ", WiFi.localIP());
     DEBUGTRACE(INFO, "WiFi status exit code is ", WiFi.status());
 
+    mDNSservices();
+
+    DEBUGTRACE(HEADING, "---------------------------- Leaving wifiConnect() -----------------------------");
+
     return true;
 }
 
 
 // terminate the wifi connect
 void WiFiHandler::wifiTerminate(void) {
+
     DEBUGTRACE(INFO, "Disconnecting from WiFi with SSID ", WiFi.SSID());
 
     WiFi.disconnect();
 
-    DEBUGTRACE(HEADING, "--------------------------------------------------------------------------------");
 }
 
 
@@ -110,7 +147,7 @@ void WiFiHandler::wifiScan(void) {
     char buffer[BUF2];
     String st;
 
-    DEBUGTRACE(HEADING, "---------------------------- Starting Network Scan -----------------------------");
+    DEBUGTRACE(HEADING, "------------------------------ Entered wifiScan() -------------------------------");
 
     numSsid = WiFi.scanNetworks();
     if (numSsid == 0) {
@@ -150,7 +187,7 @@ void WiFiHandler::wifiScan(void) {
         DEBUGTRACE(INFO, buffer);
     }
 
-    DEBUGTRACE(HEADING, "---------------------------- Network Scan Completed ----------------------------");
+    DEBUGTRACE(HEADING, "------------------------------ Leaving wifiScan() -------------------------------");
     delay(5000);   // TAKE THIS OUT!!
 
 }
@@ -159,6 +196,7 @@ void WiFiHandler::wifiScan(void) {
 // perfrom multiple scan for nearby networks, remove redundent scans, delay a few
 // milli-seconds between scans, and then return a structure containing all that you found
 void WiFiHandler::wifiScan(int scan_cnt, int delay) {
+
     struct wifiAPlist {
         char ssid[20];
         int rssi;
@@ -182,7 +220,7 @@ void WiFiHandler::udpSetPort(unsigned int port) {
 bool WiFiHandler::udpStart() {
 
     if (udp.begin(UDPport)) {
-        DEBUGTRACE(INFO, "Starting UDP for NTP connection.  Using local port ", UDPport);
+        DEBUGTRACE(INFO, "Starting UDP connection.  Using local port ", UDPport);
         return true;
     } else {
         DEBUGTRACE(ERROR, "Failed to start UDP listener.");
@@ -195,7 +233,7 @@ bool WiFiHandler::udpStart() {
 // stop listening for UDP messages on port UDPport
 void WiFiHandler::udpStop() {
 
-    DEBUGTRACE(INFO, "Stopping UDP on local port ", UDPport);
+    DEBUGTRACE(INFO, "Stopping listening UDP on local port ", UDPport);
     udp.stop();
 
 }

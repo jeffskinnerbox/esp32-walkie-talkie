@@ -30,6 +30,10 @@
 #       += is used for appending more text to variables
 #       $$ if you want a dollar sign to appear in your recipe, you must double it (‘$$’)
 #
+#
+# 	python /home/jeff/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/espota.py -d -i 192.168.1.109 -p 3232 -a 123 -f /tmp/hello-world-4/build/hello-world-4.ino.bin
+#
+#
 # SOURCES
 #   The Makefile was created with the help of this website:
 #   https://learn.sparkfun.com/tutorials/efficient-arduino-programming-with-arduino-cli-and-visual-studio-code/all
@@ -40,15 +44,18 @@
 #-------------------------------------------------------------------------------
 
 # Use Bash shell instead of the default /bin/sh
-SHELL := /bin/bash
+SHELL = /bin/bash
 
-# name of program being created
-PROG = esp32-walkie-talkie
+# name of program being created (aka hostname)
+HOSTNAME = esp32-walkie-talkie
 
 # type of package, architecture, and board in use
 PACKAGE = esp32
 ARCH =    esp32
 BOARD =   nodemcu-32s
+#PACKAGE = esp8266
+#ARCH =    esp8266
+#BOARD =   nodemcuv2
 
 # serial port used by the board
 PORT = /dev/ttyUSB0
@@ -62,13 +69,13 @@ PORT = /dev/ttyUSB0
 FQBN = $(PACKAGE):$(ARCH):$(BOARD)
 
 # location of the esptool used for usb flashing
-ESPTOOL = /home/jeff/.arduino15/packages/esp32/tools/esptool_py/2.6.1/esptool.py
+ESPTOOL = /home/jeff/.arduino15/packages/esp32/tools/esptool_py/4.2.1/esptool.py
 
 # string within names given to .bin and .elf files
-VAR := $(shell echo $(FQBN) | tr ':' '.')
+#VAR := $(shell echo $(FQBN) | tr ':' '.')
 
 # path for temp-storage of binary, object, and core.a files
-BUILD = /tmp/$(PROG)
+BUILD = /tmp/$(HOSTNAME)
 BUILD_PATH = $(BUILD)/build
 
 # paths to libraries and include files
@@ -88,18 +95,19 @@ UPLOAD_USB_FLAGS = $(VERBOSE) --fqbn $(FQBN) --port $(PORT) --input-dir $(BUILD_
 
 #--------------------------------- ota upload ----------------------------------
 
-# location of the espota.py used for ota flashing
-ESPOTATOOL = /home/jeff/.arduino15/packages/esp8266/hardware/esp8266/2.5.2/tools/espota.py
+# location of the espota.py tool used for ota flashing
+#ESPOTATOOL = /home/jeff/.arduino15/packages/esp8266/hardware/esp8266/3.0.2/tools/espota.py
+ESPOTATOOL = /home/jeff/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/espota.py
 
 # set ota password, ip address, and port for device
-OTAHOSTNAME := $(shell grep OTAHOSTNAME secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
-OTAPASS := $(shell grep OTAPASSWORD secrets.h | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
-OTAPORT := $(shell grep OTAPORT secrets.h | cut -d" " -f3)
-OTAIP := $(shell ping -c1 $(OTAHOSTNAME).local | grep "bytes from" | cut -d " " -f5 | awk '{ print substr($$0, 2) }' | awk '{ print substr( $$0, 1, length($$0)-2 ) }')
+OTAPASS := $(shell grep OTAPASSWORD secrets.h | uniq | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
+OTAPORT := $(shell grep -i $(PACKAGE) secrets.h | grep OTAPORT | cut -d" " -f3)
+HOSTPORT = 3232
+OTAIP := $(shell ping -c1 $(HOSTNAME).local | grep "bytes from" | cut -d " " -f5 | awk '{ print substr($$0, 2) }' | awk '{ print substr( $$0, 1, length($$0)-2 ) }')
 
-# ota firmware flasher and flags
-UPLOAD_OTA = python2 $(ESPOTATOOL)
-UPLOAD_OTA_FLAGS = -d -i $(OTAIP) -p $(OTAPORT) -a $(OTAPASS) -f $(PROG).$(VAR).bin
+# ota firmware flasher and its flags
+UPLOAD_OTA = $(ESPOTATOOL)
+UPLOAD_OTA_FLAGS = -d -r -i $(OTAIP) -p $(OTAPORT) -P $(HOSTPORT) -a $(OTAPASS) -f /tmp/$(HOSTNAME)/build/$(HOSTNAME).ino.bin
 
 #-------------------------------------------------------------------------------
 
@@ -113,7 +121,7 @@ all-ota: build upload-ota                       # build and then upload via ota
 
 help:
 	@echo ' '
-	@echo 'Makefile for' $(PROG)
+	@echo 'Makefile for' $(HOSTNAME)
 	@echo ' '
 	@echo 'Usage:'
 	@echo '   make              create all files and flash device via usb'
@@ -122,10 +130,13 @@ help:
 	@echo '   make build        compile the code and create the *.elf file'
 	@echo '   make upload       create the *.bin file and flash device via usb'
 	@echo '   make upload-ota   create the *.bin file and flash device via ota'
+	@echo '   make chip-id      get the chip ID from the device and exit'
 	@echo '   make erase        erease the entire flash from the device and exit'
 	@echo '   make size         print the flash size within the device and exit'
 	@echo '   make clean        delete *.bin, *.elf, *.hex files'
 	@echo '   make help         print this help message and exit'
+	@echo ' '
+	@echo "When you see 'Sending invitation to...', hit the reset button to begin OTA upload"
 	@echo ' '
 	@echo 'Pass the option "--debug" to enable trace messaging (e.g. make --debug build)'
 	@echo ' '
@@ -133,25 +144,21 @@ help:
 build:                                          # build the binary executable
 	$(CC) $(CC_FLAGS) $(CURDIR)
 
-upload:                                         # flash the binary executable via usb
-	$(UPLOAD_USB) $(UPLOAD_USB_FLAGS) $(DURDIR)
+upload:                                         # flash the binary executable via usb (aka via serial port)
+	$(UPLOAD_USB) $(UPLOAD_USB_FLAGS) $(CURDIR)
 
-upload-ota:                                     # flash the binary executable via ota
-	@echo VAR = $(VAR)
-	@echo OTAIP = $(OTAIP)
-	@echo OTAPASS = $(OTAPASS)
-	@echo OTAPORT = $(OTAPORT)
-	@echo OTAHOSTNAME = $(OTAHOSTNAME)
-	@echo UPLOAD_OTA_FLAGS = $(UPLOAD_OTA_FLAGS)
-	$(CURDIR)/answerbot $(OTAIP) 23             # using telnet, reboot the device to do OTA
-	sleep 10                                    # wait until device is ready for OTA start
+upload-ota:                                     # flash the binary executable via ota (aka via wifi)
+	@echo "When you see 'Sending invitation to...', hit the reset button to begin OTA upload"
 	$(UPLOAD_OTA) $(UPLOAD_OTA_FLAGS)
 
+chip-id:                                        # get the chip id
+	$(ESPTOOL) chip_id
+
 erase:                                          # erase the entire flash
-	$(ESPTOOL) erase_flash --port $(PORT)
+	$(ESPTOOL) erase_flash
 
 size:                                           # determine the flash size
-	$(ESPTOOL) flash_id --port $(PORT)
+	$(ESPTOOL) flash_id
 
 clean:                                          # delete all binaries and object files
 	rm -r --force $(BUILD) *.bin *.elf *.hex

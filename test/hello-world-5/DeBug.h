@@ -41,15 +41,16 @@ CREATED BY:
 
 
 #define INFO       0        // index into labels for printing information trace message
-#define WARN       1        // index into labels for printing warning trace message
-#define ERROR      2        // index into labels for printing error trace message
-#define FATAL      3        // index into labels for printing fatal trace message
-#define NOOP       4        // index into labels for printing operation not implemented yet
-#define HEADING    5        // index into labels for printing a simple heading for organizing output
-#define UNLABELED  6        // index into labels for printing unformatted text
+#define STAT       1        // index into labels for printing status change message
+#define WARN       2        // index into labels for printing warning trace message
+#define ERROR      3        // index into labels for printing error trace message
+#define FATAL      4        // index into labels for printing fatal trace message
+#define NOOP       5        // index into labels for printing operation not implemented yet
+#define HEADING    6        // index into labels for printing a simple heading for organizing output
+#define UNLABELED  7        // index into labels for printing unformatted text
 
 #define LABEL_COLS 30       // max characters in labels
-#define LABEL_ROWS 6        // number of labels (see list in constructor below)
+#define LABEL_ROWS 8        // number of labels (see list in constructor below)
 
 
 class DeBug {
@@ -57,13 +58,15 @@ class DeBug {
     //-------------- private variables -------------
     bool serial = false;     // flag to turn on/off serial trace messages
     bool telnet = false;     // flag to turn on/off telnet trace messages
-    bool preamble = false;   // flag to turn on/off preamble for trace messages
+    bool prefix = false;     // flag to turn on/off prefix for trace messages
     char **label = NULL;     // memory array used to store labels
     int cols = 0;            // max characters in labels
     int rows = 0;            // number of labels
 
     //--------------- private methods --------------
     void setLables(void);
+    bool checkWiFi(void);
+    void commandParser(char);
 
   public:
     //-- constructors & destructors for the class --
@@ -75,9 +78,10 @@ class DeBug {
     void SetupHandler(void);
     void SetupHandler(bool, bool, bool);
     void LoopHandler(void);
-    void debugOnOff(bool);
+    void wifiScan(void);
+    void serialOnOff(bool);
     void telnetOnOff(bool);
-    void preambleOnOff(bool);
+    void prefixOnOff(bool);
     void printStatus(void);
     void printInfo(void);
     void location(void);
@@ -106,7 +110,7 @@ class DeBug {
 
 //// use this to turn on/off trace messages within the programs flow
 //#define DEBUGON(s, t, p) \
-    //do { if (TDEBUG) { DB.debugOnOff(s); DB.telnetOnOff(t); DB.preambleOnOff(p); } } while(0)
+    //do { if (TDEBUG) { DB.serialOnOff(s); DB.telnetOnOff(t); DB.preambleOnOff(p); } } while(0)
 
 //// use this to print information concerning ESP & flash memory chip
 //#define DEBUGINFO(...) \
@@ -131,13 +135,16 @@ class DeBug {
     #define DEBUGPRINT(...) DB.printMsg(__VA_ARGS__);
 
     // use this to turn on/off trace messages within the programs flow
-    #define DEBUGON(s, t, p) DB.debugOnOff(s); DB.telnetOnOff(t); DB.preambleOnOff(p);
+    #define DEBUGON(s, t, p) DB.serialOnOff(s); DB.telnetOnOff(t); DB.prefixOnOff(p);
 
     // use this to print information concerning status of DeBug object
     #define DEBUGSTATUS() DB.printStatus();
 
     // use this to print information concerning ESP & flash memory chip
     #define DEBUGINFO(...) DB.printInfo();
+
+    // perfrom a single scan for nearby wifi networks
+    #define DEBUGWIFISCAN() DB.wifiScan();
 
     // NOT IMPLEMENTED YET: will provide file name + function name + line number
     #define DEBUGLOCATION() { DB.location(); Serial.printf("%s, %s, %d: \t\n\r", __FILE__, __FUNCTION__, __LINE__); }

@@ -15,11 +15,6 @@ CREATED BY:
 
 
 // ESP8266 libraries (~/.arduino15/packages/esp8266)
-#ifdef ESP32
-#include <WiFi.h>
-#else
-#include <ESP8266WiFi.h>
-#endif
 #include <WiFiUdp.h>
 
 
@@ -33,6 +28,9 @@ class WiFiHandler {
     // udp parameters
     unsigned int UDPport = 2390;     // local port to listen for UDP packets
     WiFiUDP udp;                     // A UDP object to send/receive packets
+
+    //-------------- private methods ---------------
+    bool mDNSservices(void);
 
   public:
     //-- constructors & destructors for the class --
