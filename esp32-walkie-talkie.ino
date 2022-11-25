@@ -86,7 +86,7 @@ CREATED BY:
 
 
 // found in ESP32 libraries (~/.arduino15/packages/esp32)
-#include <Arduino.h>
+//#include <Arduino.h>
 
 // this project's include files
 #include "DeBug.h"
@@ -122,9 +122,8 @@ void setup() {
     while (!Serial) {}                                   // wait for serial port to connect
 
     DEBUGSETUP();                                        // should be right after 'Serial.begin'
-    DEBUGTRACE(INFO, "--------------------------------- In setup() -----------------------------------");
+    DEBUGTRACE(HEADING, "------------------------------- Entered setup() --------------------------------");
     DEBUGTRACE(INFO, "Application Version = ", version);
-    DEBUGLOCATION();                                     // just a test stub for the "location" feature
     DEBUGSTATUS();                                       // provide information about debug status flags
     DEBUGINFO();                                         // provide some useful information about the microprocessor
 
@@ -133,17 +132,19 @@ void setup() {
     //application->begin();
     Serial.println("Application started");
 
-    DEBUGTRACE(INFO, "------------------------------- Entering loop() --------------------------------");
+    DEBUGTRACE(HEADING, "-------------------------------- Exited setup() --------------------------------");
 
 }
 
 
 void loop() {
 
-    DEBUGLOOP();
-    //OTA.loopOTA();
+    DEBUGLOOP();                         // place this anywhere in the loop() routine
+    //OTA.loopOTA();                       // place this anywhere in the loop() routine
+    //MQ.loop();                           // place this anywhere in the loop() routine
 
     // nothing to do - the application initiated in setup() is doing all the work
-    //vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(1000));
+
 }
 
