@@ -1,7 +1,7 @@
 
 /* -----------------------------------------------------------------------------
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.6
 
 DESCRIPTION:
 

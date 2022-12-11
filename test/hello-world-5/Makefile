@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 #
 # Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-# Version:      0.9.1
+# Version:      0.9.2
 #
 # USAGE
 #   To build the executable
@@ -18,10 +18,10 @@
 #
 #   To monitor execution of the device
 #       screen /dev/ttyUSB0 9600,cs8cls
-#       to terminate Ctrl-a :quit
+#       to terminate `Ctrl-a :quit`
 #
 #       telnet test-ota.local
-#       to terminate Ctrl-a quit
+#       to terminate `Ctrl-a quit`
 #
 #   Makefile Syntax
 #       =  set the variable
@@ -31,8 +31,17 @@
 #       $$ if you want a dollar sign to appear in your recipe, you must double it (‘$$’)
 #
 #
-# 	python /home/jeff/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/espota.py -d -i 192.168.1.109 -p 3232 -a 123 -f /tmp/hello-world-4/build/hello-world-4.ino.bin
+# 	python /home/jeff/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/espota.py -d -i 192.168.1.109 -p 3232 -a 123 -f /tmp/hello-world-5/build/hello-world-5.ino.bin
 #
+# LISTING BOARDS
+#   To find the type of package, architecture, and board you should be using,
+#   run the following command and search for you boards name or manufacture
+#
+#       arduino-cli board listall
+#
+#   When plugged in, your board could show up as device /dev/ttyUSB0 or /dev/ttyACM0.
+#   The later is typical when the board boots up as CircuitPython drive and mount
+#   as a mass storage device in your filesystem.  You'll see this filesystem if you execute 'df -h' in a terminal.
 #
 # SOURCES
 #   The Makefile was created with the help of this website:
@@ -43,22 +52,29 @@
 #
 #-------------------------------------------------------------------------------
 
-# Use Bash shell instead of the default /bin/sh
+# use bash shell instead of the default /bin/sh
 SHELL = /bin/bash
 
 # name of program being created (aka hostname)
 HOSTNAME = hello-world-5
 
 # type of package, architecture, and board in use
+BOARD =   nodemcu-32s      # 'Generic' NodeMCU-32S - https://www.amazon.com/gp/product/B07Q576VWZ
 PACKAGE = esp32
 ARCH =    esp32
-BOARD =   nodemcu-32s
+#BOARD =   nodemcuv2        # 'Generic' ESP8266 ESP-12E NodeMCU - https://www.amazon.com/dp/B010N1SPRK
 #PACKAGE = esp8266
 #ARCH =    esp8266
-#BOARD =   nodemcuv2
+#BOARD =   tinys2           # TinyS2 - https://unexpectedmaker.com/tinys2
+#PACKAGE = esp32
+#ARCH =    esp32
+#BOARD =   ttgo-lora32      # LilyGO TTGO T Display ESP32 - https://www.amazon.com/dp/B07X1W16QS
+#PACKAGE = esp32
+#ARCH =    esp32
 
 # serial port used by the board
 PORT = /dev/ttyUSB0
+#PORT = /dev/ttyACM0
 
 #------------------------- names, tools, flags, paths --------------------------
 

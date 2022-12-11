@@ -50,15 +50,22 @@ SHELL = /bin/bash
 HOSTNAME = hello-world-2
 
 # type of package, architecture, and board in use
+BOARD =   nodemcu-32s      # 'Generic' NodeMCU-32S - https://www.amazon.com/gp/product/B07Q576VWZ
 PACKAGE = esp32
 ARCH =    esp32
-BOARD =   nodemcu-32s
+#BOARD =   nodemcuv2        # 'Generic' ESP8266 ESP-12E NodeMCU - https://www.amazon.com/dp/B010N1SPRK
 #PACKAGE = esp8266
 #ARCH =    esp8266
-#BOARD =   nodemcuv2
+#BOARD =   tinys2           # TinyS2 - https://unexpectedmaker.com/tinys2
+#PACKAGE = esp32
+#ARCH =    esp32
+#BOARD =   ttgo-lora32      # LilyGO TTGO T Display ESP32 - https://www.amazon.com/dp/B07X1W16QS
+#PACKAGE = esp32
+#ARCH =    esp32
 
 # serial port used by the board
 PORT = /dev/ttyUSB0
+#PORT = /dev/ttyACM0
 
 #------------------------- names, tools, flags, paths --------------------------
 

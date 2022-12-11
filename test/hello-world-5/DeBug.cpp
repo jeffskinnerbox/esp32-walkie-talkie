@@ -1,7 +1,7 @@
 
 /* -----------------------------------------------------------------------------
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.6
 
 DESCRIPTION:
 
@@ -41,9 +41,11 @@ CREATED BY:
 
 #ifdef ESP32                  // found in ESP32 libraries (~/.arduino15/packages/esp32/)
 #include <WiFi.h>
+#include <driver/i2s.h>       // i2s driver
 #else                         // found in ESP8266 libraries (~/.arduino15/packages/esp8266)
 #include <ESP8266WiFi.h>
 #endif
+
 
 // found in Arduino libraries (~/Arduino/libraries)
 #include <TelnetStream.h>
@@ -178,7 +180,7 @@ void DeBug::commandParser(char c) {
         case 0xFF:
             break;
         default:
-            traceMsg(WARN, "Unknown character in commandParser() = ", c);
+            //traceMsg(WARN, "Unknown character in commandParser() = ", c);
             break;
     }
 
@@ -203,6 +205,7 @@ void DeBug::printStatus(void) {
 // print file name, function name, and line number
 void DeBug::location(void) {
     traceMsg(NOOP, "NOT IMPLEMENTED YET: Plan to provide file name + function name + line number as a prefix to trace message");
+    Serial.printf("%s, %s, %d: \t\n\r", __FILE__, __FUNCTION__, __LINE__);
 }
 
 
@@ -210,9 +213,10 @@ void DeBug::SetupHandler(void) {
 
     printMsg("\n\n\r");   // make sure you have a clean line after reboot
 
-    serialOnOff(true);
-    telnetOnOff(true);
-    prefixOnOff(false);
+    //serialOnOff(true);
+    //telnetOnOff(true);
+    //prefixOnOff(false);
+    OnOff(true, true, false);
 
 }
 
@@ -221,9 +225,10 @@ void DeBug::SetupHandler(bool ser, bool tel, bool pre) {
 
     printMsg("\n\n\r");   // make sure you have a clean line after reboot
 
-    serialOnOff(ser);
-    telnetOnOff(tel);
-    prefixOnOff(pre);
+    //serialOnOff(ser);
+    //telnetOnOff(tel);
+    //prefixOnOff(pre);
+    OnOff(ser, tel, pre);
 
 }
 
@@ -273,6 +278,15 @@ void DeBug::prefixOnOff(bool flag) {
         traceMsg(STAT, "Prefix DeBug printing is disabled");
 
     prefix = flag;                // update DeBug object's flag
+
+}
+
+
+void DeBug::OnOff(bool flag1, bool flag2, bool flag3) {
+
+    serialOnOff(flag1);
+    telnetOnOff(flag2);
+    prefixOnOff(flag3);
 
 }
 
@@ -570,6 +584,7 @@ template void DeBug::printMsg<unsigned int, int>(unsigned int, int);
 template void DeBug::traceMsg<int>(int, char*, int);
 template void DeBug::traceMsg<bool>(int, char*, bool);
 template void DeBug::traceMsg<char*>(int, char*, char*);
+template void DeBug::traceMsg<short>(int, char*, short);
 template void DeBug::traceMsg<String>(int, char*, String);
 template void DeBug::traceMsg<int, int>(int, char*, int, int);
 template void DeBug::traceMsg<IPAddress>(int, char*, IPAddress);
@@ -584,6 +599,9 @@ template void DeBug::traceMsg<unsigned int, int>(int, char*, unsigned int, int);
 template void DeBug::traceMsg<unsigned char, int>(int, char*, unsigned char, int);
 template void DeBug::traceMsg<char*, char const*>(int, char*, char*, char const*);
 template void DeBug::traceMsg<char const*, char*>(int, char*, char const*, char*);
+
+template void DeBug::traceMsg<gpio_num_t>(int, char*, gpio_num_t);
+template void DeBug::traceMsg<i2s_port_t>(int, char*, i2s_port_t);
 
 #ifdef ESP32
 template void DeBug::traceMsg<StringSumHelper>(int, char*, StringSumHelper);

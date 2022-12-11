@@ -1,7 +1,7 @@
 
 /* -----------------------------------------------------------------------------
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.6
 
 DESCRIPTION:
     Debugging routings that print trace messages on serial port
@@ -82,6 +82,7 @@ class DeBug {
     void serialOnOff(bool);
     void telnetOnOff(bool);
     void prefixOnOff(bool);
+    void OnOff(bool, bool, bool);
     void printStatus(void);
     void printInfo(void);
     void location(void);
@@ -99,73 +100,27 @@ class DeBug {
 // -----------------------------------------------------------------------------
 
 
-#ifdef TDEBUG
-/*// use this to create a labeled trace message*/
-//#define DEBUGTRACE(lev, ...) \
-    //do { if (TDEBUG) DB.traceMsg(lev, __VA_ARGS__); } while(0)
-
-//// use this to print an unlabeled message
-//#define DEBUGPRINT(...) \
-    //do { if (TDEBUG) DB.printMsg(__VA_ARGS__); } while(0)
-
-//// use this to turn on/off trace messages within the programs flow
-//#define DEBUGON(s, t, p) \
-    //do { if (TDEBUG) { DB.serialOnOff(s); DB.telnetOnOff(t); DB.preambleOnOff(p); } } while(0)
-
-//// use this to print information concerning ESP & flash memory chip
-//#define DEBUGINFO(...) \
-    //do { if (TDEBUG) DB.printInfo(); } while(0)
-
-//// NOT IMPLEMENTED YET: will provide file name + function name + line number
-//#define DEBUGLOCATION() \
-    //do { if (TDEBUG) Serial.printf("%s, %s, %d: \t", __FILE__, __FUNCTION__, __LINE__); } while(0)
-
-//// place this macro within the setup() function
-//#define DEBUGSETUP() \
-    //do { if (TDEBUG) DB.debugBegin(); } while(0)
-
-//// place this macro within the loop() function
-//#define DEBUGLOOP() \
-    /*do { if (TDEBUG) DB.TelnetHandler(); } while(0)*/
-
-    // use this to create a labeled trace message
-    #define DEBUGTRACE(lev, ...) DB.traceMsg(lev, __VA_ARGS__);
-
-    // use this to print an unlabeled message
-    #define DEBUGPRINT(...) DB.printMsg(__VA_ARGS__);
-
-    // use this to turn on/off trace messages within the programs flow
-    #define DEBUGON(s, t, p) DB.serialOnOff(s); DB.telnetOnOff(t); DB.prefixOnOff(p);
-
-    // use this to print information concerning status of DeBug object
-    #define DEBUGSTATUS() DB.printStatus();
-
-    // use this to print information concerning ESP & flash memory chip
-    #define DEBUGINFO(...) DB.printInfo();
-
-    // perfrom a single scan for nearby wifi networks
-    #define DEBUGWIFISCAN() DB.wifiScan();
-
-    // NOT IMPLEMENTED YET: will provide file name + function name + line number
-    #define DEBUGLOCATION() { DB.location(); Serial.printf("%s, %s, %d: \t\n\r", __FILE__, __FUNCTION__, __LINE__); }
-
-    // place this macro within the setup() function, must be after Serial.begin()
-    #define DEBUGSETUP() DB.SetupHandler();
-
-    // place this macro within the loop() function
-    #define DEBUGLOOP() DB.LoopHandler();
-
+#if TDEBUG
+    #define DEBUGTRACE(lev, ...) DB.traceMsg(lev, __VA_ARGS__); // create a labeled trace message
+    #define DEBUGPRINT(...) DB.printMsg(__VA_ARGS__);           // print an unlabeled message
+    #define DEBUGON(s, t, p) DB.OnOff(s, t, p);                 // turn on/off trace messages within the programs flow
+    #define DEBUGSTATUS() DB.printStatus();                     // print information concerning status of DeBug object
+    #define DEBUGINFO(...) DB.printInfo();                      // print information concerning ESP & flash memory chip
+    #define DEBUGWIFISCAN() DB.wifiScan();                      // perfrom a single scan for nearby wifi networks
+    #define DEBUGSETUP() DB.SetupHandler();                     // macro within the setup() function, must be after Serial.begin()
+    #define DEBUGLOOP() DB.LoopHandler();                       // macro within the loop() function
+    #define DEBUGLOCATION() DB.location();                      // NOT IMPLEMENTED YET
 #else
     #define DEBUGTRACE(lev, ...)
     #define DEBUGPRINT(...)
     #define DEBUGON(s, t, p)
     #define DEBUGSTATUS()
     #define DEBUGINFO(...)
-    #define DEBUGLOCATION()
+    #define DEBUGWIFISCAN()
     #define DEBUGSETUP()
     #define DEBUGLOOP()
+    #define DEBUGLOCATION()
 #endif
-
 
 // -----------------------------------------------------------------------------
 
