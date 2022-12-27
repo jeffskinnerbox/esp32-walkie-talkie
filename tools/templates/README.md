@@ -12,63 +12,29 @@ Version:      0.9.6
 -----
 
 
-# DESCRIPTION
 
-# PHYSICAL DESIGN
+## DeBug
 
-## Hardware
+## MQTTHandler
 
-### <Specific Device(s)>
+## WiFiHandler
 
-## Wiring
+## OTAHandler
+esp32 OTA Component to update firmware from Github Releases
+Automate your OTA and CI/CD pipeline with Github Actions to update your ESP32 devices in the field direct from github releases
 
-# SOFTWARE SETTINGS
+* [Push ESP32 Over The Air Updates From GitHub](https://hackaday.com/2022/12/13/push-esp32-over-the-air-updates-from-github/)
+    * [GITHUB OTA for ESP32 devices](https://github.com/Fishwaldo/esp_ghota)
+* [LIBRARY MAKES ESP OVER THE AIR UPDATES EASY](https://hackaday.com/2019/03/21/library-makes-esp-over-the-air-updates-easy/)
+    * [ESP WebOTA](https://github.com/scottchiefbaker/ESP-WebOTA)
+    * [ESP32 Over-the-air (OTA) Programming – Web Updater Arduino IDE](https://randomnerdtutorials.com/esp32-over-the-air-ota-programming/)
 
-# MONITOR
-If the files `DeBug.cpp` & `DeBug.h` were compiled into the code,
-it will provide you trace information useful for debugging.
-You can monitor the execution of the program via the USB serial port,
-connection the USB port to a Linux computer and execute the following:
+## configuration.h
 
-    screen /dev/ttyUSB0 9600,cs8cls
+## secrets.h
 
-To terminate `screen`, you should enter: `CNTR-a :quit`.
-To stop the screen scrolling, enter: `CNTR-a :`.
+## secrets.template.h
 
-When you can't connect with the devices USB port,
-you can get the same trace messages remotely via `telnet`:
+## Makefile
 
-    telnet <hostname>lock.local
-    telnet 192.168.1.44
-
-To terminate `telnet` you should use `Ctrl-]` followed by `quit`.
-
-If you don't have the host name or you didn't use the [mDNS service][01] in the program,
-you can get the IP address of this program by doing one of the following:
-
-    sudo arp-scan 192.168.1.0/24 | grep Espressif
-    sudo netdiscover -c 3 -s 10 -L -N -r 192.168.1.0/24 | grep Espressif
-
-# CALIBRATION
-
-# TESTING
-
-# REFERENCE MATERIALS
-These documents were helpful in the design of this project:
-
-# SOURCES
-Source code for this project was taken from:
-
-
-
-[01]:https://espressif.github.io/esp-protocols/mdns/en/index.html
-[02]:
-[03]:
-[04]:
-[05]:
-[06]:
-[07]:
-[08]:
-[09]:
-[10]:
-
+## gitignore

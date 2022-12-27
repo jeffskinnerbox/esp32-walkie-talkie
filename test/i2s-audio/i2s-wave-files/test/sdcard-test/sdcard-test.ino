@@ -147,7 +147,10 @@ void setup() {
 
     SDCard = new CardHandler();
 
-    SDCard->testFileIO("/test.txt");
+    //SDCard->testFileIO("/test.txt");
+    DEBUGTRACE(INFO, "I made it to here - 1");
+    SDCard->deleteFile("/test.txt");
+    DEBUGTRACE(INFO, "I made it to here - 2");
 
     DEBUGTRACE(HEADING, "-------------------------------- Exited setup() --------------------------------");
 
@@ -161,6 +164,7 @@ void loop() {
     DEBUGTRACE(INFO, "---------- I2S Wave File Test ----------");
 
     SDCard->listDir("/", 0);
+#ifdef XXX
     SDCard->createDir("/mydir");
     SDCard->listDir("/", 0);
     SDCard->removeDir("/mydir");
@@ -172,6 +176,7 @@ void loop() {
     SDCard->listDir("/", 3);
     SDCard->deleteFile("/foo.txt");
     SDCard->renameFile("/hello.txt", "/foo.txt");
+#endif
 
     delay(5000);
 

@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 #
 # Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-# Version:      0.9.6
+# Version:      0.9.2
 #
 # USAGE
 #   To build the executable
@@ -18,10 +18,10 @@
 #
 #   To monitor execution of the device
 #       screen /dev/ttyUSB0 9600,cs8cls
-#       to terminate Ctrl-a :quit
+#       to terminate `Ctrl-a :quit`
 #
 #       telnet test-ota.local
-#       to terminate Ctrl-a quit
+#       to terminate `Ctrl-a quit`
 #
 #   Makefile Syntax
 #       =  set the variable
@@ -31,17 +31,17 @@
 #       $$ if you want a dollar sign to appear in your recipe, you must double it (‘$$’)
 #
 #
-# 	python /home/jeff/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/espota.py -d -i 192.168.1.109 -p 3232 -a 123 -f /tmp/hello-world-4/build/hello-world-4.ino.bin
+# 	python /home/jeff/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/espota.py -d -i 192.168.1.109 -p 3232 -a 123 -f /tmp/hello-world-5/build/hello-world-5.ino.bin
 #
-# PINOUT
-#   nodemcuv2
-#   esp32doit-devkit-v1
-#   nodemcu-32s
-#   tinys2
-#   lolin32
-#   ttgo-lolin32
-#   heltec_wifi_kit_32
-#   dfrobot_firebeetle2_esp32s3
+# LISTING BOARDS
+#   To find the type of package, architecture, and board you should be using,
+#   run the following command and search for you boards name or manufacture
+#
+#       arduino-cli board listall
+#
+#   When plugged in, your board could show up as device /dev/ttyUSB0 or /dev/ttyACM0.
+#   The later is typical when the board boots up as CircuitPython drive and mount
+#   as a mass storage device in your filesystem.  You'll see this filesystem if you execute 'df -h' in a terminal.
 #
 # SOURCES
 #   The Makefile was created with the help of this website:
@@ -52,35 +52,23 @@
 #
 #-------------------------------------------------------------------------------
 
-# Use Bash shell instead of the default /bin/sh
+# use bash shell instead of the default /bin/sh
 SHELL = /bin/bash
 
 # name of program being created (aka hostname)
-HOSTNAME = esp32-walkie-talkie
+HOSTNAME = hello-world-6
 
 # type of package, architecture, and board in use
-#BOARD =   nodemcuv2              # ESP8266 ESP-12E NodeMCU, 30 pins
-#PACKAGE = esp8266
-#ARCH =    esp8266
-#BOARD =   esp32doit-devkit-v1    # DOIT ESP32 DEVKIT DOIT V1, MELIFE ESP-32S, 30 pins
-#PACKAGE = esp32
-#ARCH =    esp32
-BOARD =   nodemcu-32s            # DOIT ESP32 DEVKIT DOIT V2, KeeYees ESP32S Dev Board, HiLetgo ESP-WROOM-32, 38 pins
+BOARD =   nodemcu-32s      # 'Generic' NodeMCU-32S - https://www.amazon.com/gp/product/B07Q576VWZ
 PACKAGE = esp32
 ARCH =    esp32
-#BOARD =   tinys2                 # TinyS2 ESP32-S2 Board - https://unexpectedmaker.com/tinys2
+#BOARD =   nodemcuv2        # 'Generic' ESP8266 ESP-12E NodeMCU - https://www.amazon.com/dp/B010N1SPRK
+#PACKAGE = esp8266
+#ARCH =    esp8266
+#BOARD =   tinys2           # TinyS2 - https://unexpectedmaker.com/tinys2
 #PACKAGE = esp32
 #ARCH =    esp32
-#BOARD =   lolin32                # ESP32 WeMos Lolin32, ESP32 WROOM Lolin32, pins 26
-#PACKAGE = esp32
-#ARCH =    esp32
-#BOARD =   ttgo-lolin32           # LilyGO TTGO T Display ESP32 - https://www.amazon.com/dp/B07X1W16QS
-#PACKAGE = esp32
-#ARCH =    esp32
-#BOARD =   heltec_wifi_kit_32     # Heltec ESP32 0.96" OLED Display, MakerFocus ESP32 0.96" OLED Display, 36 pins
-#PACKAGE = esp32
-#ARCH =    esp32
-#BOARD =   dfrobot_firebeetle2_esp32s3  # DFRobot FireBeetle Board ESP32-E, 32 pins
+#BOARD =   ttgo-lora32      # LilyGO TTGO T Display ESP32 - https://www.amazon.com/dp/B07X1W16QS
 #PACKAGE = esp32
 #ARCH =    esp32
 
@@ -128,10 +116,10 @@ UPLOAD_USB_FLAGS = $(VERBOSE) --fqbn $(FQBN) --port $(PORT) --input-dir $(BUILD_
 ESPOTATOOL = /home/jeff/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/espota.py
 
 # set ota password, ip address, and port for device
-#OTAPASS := $(shell grep OTAPASSWORD secrets.h | uniq | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
-#OTAPORT := $(shell grep -i $(PACKAGE) secrets.h | grep OTAPORT | cut -d" " -f3)
-#HOSTPORT = 3232
-#OTAIP := $(shell ping -c1 $(HOSTNAME).local | grep "bytes from" | cut -d " " -f5 | awk '{ print substr($$0, 2) }' | awk '{ print substr( $$0, 1, length($$0)-2 ) }')
+OTAPASS := $(shell grep OTAPASSWORD secrets.h | uniq | cut -d" " -f3 | awk '{print substr($$0, 2, length($$0) - 2)}')
+OTAPORT := $(shell grep -i $(PACKAGE) secrets.h | grep OTAPORT | cut -d" " -f3)
+HOSTPORT = 3232
+OTAIP := $(shell ping -c1 $(HOSTNAME).local | grep "bytes from" | cut -d " " -f5 | awk '{ print substr($$0, 2) }' | awk '{ print substr( $$0, 1, length($$0)-2 ) }')
 
 # ota firmware flasher and its flags
 UPLOAD_OTA = $(ESPOTATOOL)

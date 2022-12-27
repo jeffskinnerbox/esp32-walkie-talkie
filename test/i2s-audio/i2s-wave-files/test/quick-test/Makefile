@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 #
 # Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-# Version:      0.9.6
+# Version:      0.9.1
 #
 # USAGE
 #   To build the executable
@@ -33,15 +33,6 @@
 #
 # 	python /home/jeff/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/espota.py -d -i 192.168.1.109 -p 3232 -a 123 -f /tmp/hello-world-4/build/hello-world-4.ino.bin
 #
-# PINOUT
-#   nodemcuv2
-#   esp32doit-devkit-v1
-#   nodemcu-32s
-#   tinys2
-#   lolin32
-#   ttgo-lolin32
-#   heltec_wifi_kit_32
-#   dfrobot_firebeetle2_esp32s3
 #
 # SOURCES
 #   The Makefile was created with the help of this website:
@@ -56,7 +47,7 @@
 SHELL = /bin/bash
 
 # name of program being created (aka hostname)
-HOSTNAME = esp32-walkie-talkie
+HOSTNAME = quick-test
 
 # type of package, architecture, and board in use
 #BOARD =   nodemcuv2              # ESP8266 ESP-12E NodeMCU, 30 pins

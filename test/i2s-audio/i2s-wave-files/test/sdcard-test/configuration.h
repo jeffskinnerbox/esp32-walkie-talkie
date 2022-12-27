@@ -21,7 +21,7 @@ CREATED BY
 
 
 // --------------------------------- host name ---------------------------------
-#define HOSTNAME "i2s-wave-files"  // hostname of this application
+#define HOSTNAME "sdcard-test"     // hostname of this application
 #define SERIAL_SPEED 9600          // bit rate speed of serial interface
 
 
@@ -55,7 +55,8 @@ CREATED BY
 
 // ----------------------------- sizes of buffers ------------------------------
 #define BUF1_SIZE 25             // array size for small buffers
-#define BUF2_SIZE 50             // array size for large buffers
+#define BUF2_SIZE 50             // array size for medium buffers
+#define BUF3_SIZE 100            // array size for large buffers
 
 
 // ------------------------------- include files -------------------------------

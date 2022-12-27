@@ -16,8 +16,6 @@ Version:      0.0.0
 Additional `CardHandler` services ideas can be found here
 [Interfacing Micro SD Card Module with Arduino](https://lastminuteengineers.com/arduino-micro-sd-card-module-tutorial/)
 
-* [ESP32_SD_Benchmark.ino](https://github.com/moononournation/ESP32_SD_Benchmark)
-
 
 # DESCRIPTION
 The `i2s-music-player` program uses the ESP32 I2
@@ -27,13 +25,12 @@ and plays the music via a head phone
 
 Sources:
 * [Interfacing Micro SD Card Module with Arduino][11]
-* [ESP32 – Micro SD Card Interface](https://www.instructables.com/ESP32-Micro-SD-Card-Interface/)
 * [Building a Digital Music Player with I2S?! What is I2S! EB#45](https://www.youtube.com/watch?v=qNLvoSQCx60)
 * [ESP32 Sound - Working with I2S](https://www.youtube.com/watch?v=m-MPBjScNRk)
 * [I2S Sound Tutorial for ESP32](https://diyi0t.com/i2s-sound-tutorial-for-esp32/)
 * [Guide to SD Card Module with Arduino](https://randomnerdtutorials.com/guide-to-sd-card-module-with-arduino/)
 * [ESP32: Guide for MicroSD Card Module using Arduino IDE][13]
-* [ESP32 with SD card modules — The master guide](https://deguez07.medium.com/esp32-with-sd-card-modules-the-master-guide-5d391f6785d7)
+* [How to use SD card with esp32 – 2](https://www.mischianti.org/2021/03/28/how-to-use-sd-card-with-esp32-2/)
 
 ## SD Card Module
 Embeded devices can use a [Micro SD (aka TF or TransFlash) card][08],

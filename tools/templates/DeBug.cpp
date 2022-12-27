@@ -251,7 +251,7 @@ void DeBug::telnetOnOff(bool flag) {
 
     if (flag)
         if (!checkWiFi()) {
-            traceMsg(WARN, "WiFi isn't connected, therefore, use of telnet (TelnetStream) could cause crash");
+            traceMsg(STAT, "WiFi isn't connected, therefore, use of telnet (TelnetStream) could cause crash");
             traceMsg(STAT, "Telnet DeBug printing is disabled");
             telnet = false;       // update DeBug object's flag
             return;

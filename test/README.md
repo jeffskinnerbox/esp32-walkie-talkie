@@ -26,6 +26,22 @@ arduino-cli board listall
 
 
 
+---------
+
+
+
+# ESP32 Audio Kit
+* [How to build VoIP project on ESP32 Audio Kit](https://www.youtube.com/watch?v=2eKuLPoECL0)
+* [ESP32-audioI2S](https://github.com/schreibfaul1/ESP32-audioI2S)
+
+
+
+---------
+
+
+
+
+
 ## ESP8266
 
 ## Original ESP8266

@@ -28,29 +28,30 @@ CREATED BY
 // --------------------------- board pin assignment ----------------------------
 #ifdef ESP32
 #define PCBLED   LED_BUILTIN       // ESP32 Pin to which onboard LED is connected
-#define SCK_PIN  17
-#define MISO_PIN 19
-#define MOSI_PIN 23
-#define CS_PIN   5
+#define SCK_PIN  GPIO_NUM_18       // clock (aka sclk)
+#define MISO_PIN GPIO_NUM_19       // master input / slave output
+#define MOSI_PIN GPIO_NUM_23       // master output / slave input
+#define CS_PIN   GPIO_NUM_5        // chip select (aka ss = slave select)
 #else
 #define PCBLED   D0                // ESP8266 Pin to which onboard LED is connected
 #endif
 
 
 // ----------------------------------- ???  ------------------------------------
-#define ONE_SECOND        1000UL        // milliseconds in one second
-#define TWO_SECOND        2000UL        // milliseconds in two second
-#define FIVE_SECOND       5000UL        // milliseconds in five second
-#define TEN_SECOND        10000UL       // milliseconds in ten second
-#define HALF_MINUTE       30000UL       // milliseconds in half a minute
-#define ONE_MINUTE        60000UL       // milliseconds in one minute
-#define ONE_HOUR          3600000UL     // milliseconds in one hour
-#define ONE_DAY           85400000UL    // milliseconds in one day
-#define SEVENTYYEARS      2208988800UL  // seconds in seventy years
+#define ONE_SECOND   1000UL        // milliseconds in one second
+#define TWO_SECOND   2000UL        // milliseconds in two second
+#define FIVE_SECOND  5000UL        // milliseconds in five second
+#define TEN_SECOND   10000UL       // milliseconds in ten second
+#define HALF_MINUTE  30000UL       // milliseconds in half a minute
+#define ONE_MINUTE   60000UL       // milliseconds in one minute
+#define ONE_HOUR     3600000UL     // milliseconds in one hour
+#define ONE_DAY      85400000UL    // milliseconds in one day
+#define SEVENTYYEARS 2208988800UL  // seconds in seventy years
 
 // variables for LED blinking
 #define STD_BLKRATE  1000UL        // LED blink rate for 'sign-of-life'/normal operation (milli-seconds)
 #define FAST_BLKRATE 250UL         // LED blink rate for 'troubled' operation (milli-seconds)
+#define PANIC_BLKRATE 60UL         // LED blink rate for 'panic' operation (milli-seconds)
 
 // variables for OTA management
 #define OTA_MAXTIME 15000UL        // max time to wait for ota handler to engage (milli-seconds)

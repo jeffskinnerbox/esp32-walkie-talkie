@@ -239,7 +239,6 @@ void DeBug::serialOnOff(bool flag) {
         traceMsg(STAT, "Serial DeBug printing is enabled");
     } else {
         traceMsg(STAT, "Serial DeBug printing is disabled");
-        Serial.flush();
     }
 
     serial = flag;                // update DeBug object's flag
@@ -261,7 +260,6 @@ void DeBug::telnetOnOff(bool flag) {
         TelnetStream.begin();
         traceMsg(STAT, "Telnet DeBug printing is enabled");
     } else {
-        TelnetStream.flush();
         traceMsg(STAT, "Telnet DeBug printing is disabled");
     }
 
