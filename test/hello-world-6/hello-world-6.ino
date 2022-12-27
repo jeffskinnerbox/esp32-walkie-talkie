@@ -243,7 +243,7 @@ void loop() {
     static unsigned char uc_num = 0x00;
     static int i_num = 0;
     static unsigned int ui_num = 0;
-    static long l_num = 0;
+    static long l_num = 0, l_num2 = OTA_BLKRATE;
     static float f_num = 0;
 
     DEBUGLOOP();                         // place this anywhere in the loop() routine

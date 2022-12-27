@@ -20,7 +20,7 @@ CREATED BY
 
 
 // ------------------------------------- host name  -------------------------------------
-#define HOSTNAME "hostname"        // hostname of this application
+#define HOSTNAME "hello-world-6"   // hostname of this application
 #define SERIAL_SPEED 9600          // bit rate speed of serial interface
 
 

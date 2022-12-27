@@ -80,7 +80,7 @@ void OTAHandler::printStatus(void) {
     DEBUGTRACE(INFO, "\tOTA flag = %s", ota_flag ? "true" : "false");
     DEBUGTRACE(INFO, "\tOTA port = %s", String(OTAPORT));
     DEBUGTRACE(INFO, "\tHostname = %s", ArduinoOTA.getHostname() + ".local");
-    DEBUGTRACE(INFO, "\tIP address = %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3]);
+    DEBUGTRACE(INFO, "\tIP address = %s", WiFi.localIP());
 
 }
 
@@ -163,15 +163,21 @@ void OTAHandler::setupOTA(void) {
 
 
 void OTAHandler::loopOTA(void) {
+
     unsigned long currentTime = millis();
     static unsigned long previousTime = millis();
-    static unsigned long elapsedTime, i = 0;
+    static unsigned long elapsedTime;
+    static bool flag = true;
 
     TelnetStreamHandler();
 
     // if ota is being requested, activate the handler
     if (ota_flag) {
         DEBUGTRACE(HEADING, "--------------------------- Entered OTA update state ---------------------------");
+        if (flag) {
+            DEBUGTRACE(INFO, "Waiting %d seconds for OTA to be initiated, after which it will not be accepted.", max_time / 1000);
+            flag = false;
+        }
         while (currentTime - previousTime < max_time) {
             ArduinoOTA.handle();     // OTA handler, look for OTA update request
             currentTime = millis();
