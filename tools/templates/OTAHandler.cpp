@@ -1,7 +1,7 @@
 
 /* -----------------------------------------------------------------------------
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.7
 
 DESCRIPTION:
 
@@ -25,14 +25,7 @@ CREATED BY:
 #include <ArduinoOTA.h>
 #endif
 
-// found in Arduino libraries (~/Arduino/libraries)
 #include <TelnetStream.h>
-
-// found in Arduino libraries (~/src/arduino/libraries)
-
-// found in Arduino Sketchbooks libraries (~/src/arduino/sketchbooks/libraries)
-
-// project include files
 #include "DeBug.h"
 #include "configuration.h"
 #include "OTAHandler.h"
@@ -84,18 +77,10 @@ void OTAHandler::printStatus(void) {
 
     DEBUGTRACE(INFO, "Current status of OTAHandler object: ");
 
-    DEBUGTRACE(INFO, "\tOTA flag = ", ota_flag ? "true" : "false");
-    //DEBUGTRACE(INFO, "\tMax Time = ", max_time ? "true" : "false");
-    //DEBUGTRACE(INFO, "\tBlink Rate = ", blink_rate ? "true" : "false");
-    //DEBUGTRACE(INFO, "\tStandard Rate = ", standard_rate ? "true" : "false");
-
-    //DEBUGTRACE(INFO, "\tOTAPORT = ", OTAPORT);
-    //DEBUGTRACE(INFO, "\tOTAHOSTNAME = ", HOSTNAME);
-    //DEBUGTRACE(INFO, "\tOTAPASSWORD = ", OTAPASSWORD);
-
-    DEBUGTRACE(INFO, "\tOTA port = ", String(OTAPORT));
-    DEBUGTRACE(INFO, "\tHostname = ", ArduinoOTA.getHostname() + ".local");
-    DEBUGTRACE(INFO, "\tIP address = ", WiFi.localIP());
+    DEBUGTRACE(INFO, "\tOTA flag = %s", ota_flag ? "true" : "false");
+    DEBUGTRACE(INFO, "\tOTA port = %s", String(OTAPORT));
+    DEBUGTRACE(INFO, "\tHostname = %s", ArduinoOTA.getHostname() + ".local");
+    DEBUGTRACE(INFO, "\tIP address = %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3]);
 
 }
 

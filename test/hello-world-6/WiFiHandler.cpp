@@ -1,7 +1,7 @@
 
 /*------------------------------------------------------------------------------
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.7
 
 DESCRIPTION:
 
@@ -29,12 +29,7 @@ CREATED BY:
 #include <ESPAsyncWebServer.h>
 #endif
 
-// Arduino libraries (~/src/arduino/libraries)
 #include <Arduino.h>
-
-// Arduino Sketchbooks libraries (~/src/arduino/sketchbooks/libraries)
-
-// simple-display project's include files (~/src/scrolling-display/test/simple-display)
 #include "DeBug.h"
 #include "configuration.h"
 #include "WiFiHandler.h"

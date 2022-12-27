@@ -2,7 +2,7 @@
 /* -----------------------------------------------------------------------------
 
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.7
 
 DESCRIPTION
 
@@ -46,7 +46,6 @@ CREATED BY
 //--------------------------- Global Scoped Variables --------------------------
 
 extern DeBug DB;            // declare object DB as external, it is instantiated in DeBug.cpp
-//extern MQTTHandler MQ;      // declare object MQ as external, and member of class MQTTHandler
 
 
 
@@ -124,7 +123,8 @@ int MQTTHandler::state(void) {
 }
 
 
-// called regularly to allow the client to process incoming messages and maintain its connection to the server
+// called regularly to allow the client to process incoming messages
+// and maintain its connection to the server
 // false = the client is no longer connected    true = the client is still connected
 boolean MQTTHandler::loop(void) {
     boolean rtn;

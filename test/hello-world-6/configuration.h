@@ -2,7 +2,7 @@
 /* -----------------------------------------------------------------------------
 
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.7
 
 DESCRIPTION
     Use this file to store all of application configruation details
@@ -20,7 +20,7 @@ CREATED BY
 
 
 // ------------------------------------- host name  -------------------------------------
-#define HOSTNAME "hello-world-6"   // hostname of this application
+#define HOSTNAME "hostname"        // hostname of this application
 #define SERIAL_SPEED 9600          // bit rate speed of serial interface
 
 
@@ -34,10 +34,11 @@ CREATED BY
 
 // ------------------------------------- ???  -------------------------------------
 #define STD_BLKRATE 1000UL         // LED blink rate for 'sign-of-life'/normal operation (milli-seconds)
+#define PANIC_BLKRATE 100UL        // LED blink rate for panic operation (milli-seconds)
 
 // variables for OTA management
 #define OTA_MAXTIME 15000UL        // max time to wait for ota handler to engage (milli-seconds)
-#define OTA_BLKRATE 200UL          // LED blink rate to signal accepting OTA update (milli-seconds)
+#define OTA_BLKRATE 250UL          // LED blink rate to signal accepting OTA update (milli-seconds)
 
 
 // ------------------------------------- sizes of buffers -------------------------------------

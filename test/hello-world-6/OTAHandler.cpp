@@ -1,7 +1,7 @@
 
 /* -----------------------------------------------------------------------------
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.7
 
 DESCRIPTION:
 
@@ -25,14 +25,7 @@ CREATED BY:
 #include <ArduinoOTA.h>
 #endif
 
-// found in Arduino libraries (~/Arduino/libraries)
 #include <TelnetStream.h>
-
-// found in Arduino libraries (~/src/arduino/libraries)
-
-// found in Arduino Sketchbooks libraries (~/src/arduino/sketchbooks/libraries)
-
-// project include files
 #include "DeBug.h"
 #include "configuration.h"
 #include "OTAHandler.h"

@@ -2,7 +2,7 @@
 /*------------------------------------------------------------------------------
 
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.0.1
+Version:      0.0.2
 
 DESCRIPTION:
     This a ESP32 test routine using the WiFiHandler, OTAHandler, and DeBug classes.

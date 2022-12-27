@@ -1,7 +1,7 @@
 
 /*------------------------------------------------------------------------------
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.7
 
 DESCRIPTION:
 
@@ -29,12 +29,7 @@ CREATED BY:
 #include <ESPAsyncWebServer.h>
 #endif
 
-// Arduino libraries (~/src/arduino/libraries)
 #include <Arduino.h>
-
-// Arduino Sketchbooks libraries (~/src/arduino/sketchbooks/libraries)
-
-// simple-display project's include files (~/src/scrolling-display/test/simple-display)
 #include "DeBug.h"
 #include "configuration.h"
 #include "WiFiHandler.h"
@@ -176,7 +171,7 @@ bool WiFiHandler::wifiConnect(char *id, char *pass, unsigned long tout) {
     DEBUGTRACE(HEADING, "---------------------------- Entered wifiConnect() -----------------------------");
 
     // attempt first connect to a WiFi network
-    DEBUGTRACE(INFO, "Attempting connection to WiFi SSID ", ssid);
+    DEBUGTRACE(INFO, "Attempting connection to WiFi SSID: %s", ssid);
     WiFi.begin(ssid, password);
     WiFi.mode(WIFI_STA);                      // ESP-32 as wifi client / Station Mode (STA)
 
@@ -185,16 +180,16 @@ bool WiFiHandler::wifiConnect(char *id, char *pass, unsigned long tout) {
     while(WiFi.status() != WL_CONNECTED) {
         DEBUGPRINT(".");
         if (millis() > tout) {
-            DEBUGTRACE(ERROR, "Failed to connect to WiFi!  WiFi status exit code is ", WiFi.status());
-            DEBUGTRACE(ERROR, "Timed out after (milliseconds): ", timeout);
+            DEBUGTRACE(ERROR, "Failed to connect to WiFi!  WiFi status exit code is %d", WiFi.status());
+            DEBUGTRACE(ERROR, "Timed out after (milliseconds): %d", timeout);
             return false;
         }
         delay(500);
     }
 
     DEBUGPRINT(".\n\r");
-    DEBUGTRACE(INFO, "Successfully connected to WiFi!  IP address is ", WiFi.localIP());
-    DEBUGTRACE(INFO, "WiFi status exit code is ", WiFi.status());
+    DEBUGTRACE(INFO, "Successfully connected to WiFi!  IP address is %s", WiFi.localIP());
+    DEBUGTRACE(INFO, "WiFi status exit code is %d", WiFi.status());
 
     mDNSservices();
     Webservices();
@@ -208,7 +203,9 @@ bool WiFiHandler::wifiConnect(char *id, char *pass, unsigned long tout) {
 // terminate the wifi connect
 void WiFiHandler::wifiTerminate(void) {
 
-    DEBUGTRACE(INFO, "Disconnecting from WiFi with SSID ", WiFi.SSID());
+    String st = WiFi.SSID();     // convert from sting object to character string
+
+    DEBUGTRACE(INFO, "Disconnecting from WiFi with SSID %s", st.c_str());
 
     WiFi.disconnect();
 
@@ -231,9 +228,8 @@ void WiFiHandler::wifiScan(void) {
     }
 
     // print the list of networks seen
-    DEBUGTRACE(INFO, "Total number of SSIDs found: ", numSsid);
-    snprintf(buffer, BUF2_SIZE, "\t%-20s\t%s\t%s", "SSID", "RSSI", "Encryp_Type");
-    DEBUGTRACE(INFO, buffer);
+    DEBUGTRACE(INFO, "Total number of SSIDs found: %d", numSsid);
+    DEBUGTRACE(INFO, "\t%-20s\t%s\t%s", "SSID", "RSSI", "Encryp_Type");
 
     // print the name and characteristics of each network found
     for (int thisNet = 0; thisNet < numSsid; thisNet++) {
@@ -295,7 +291,7 @@ void WiFiHandler::udpSetPort(unsigned int port) {
 bool WiFiHandler::udpStart() {
 
     if (udp.begin(UDPport)) {
-        DEBUGTRACE(INFO, "Starting UDP connection.  Using local port ", UDPport);
+        DEBUGTRACE(INFO, "Starting UDP connection.  Using local port %d", UDPport);
         return true;
     } else {
         DEBUGTRACE(ERROR, "Failed to start UDP listener.");
@@ -308,7 +304,7 @@ bool WiFiHandler::udpStart() {
 // stop listening for UDP messages on port UDPport
 void WiFiHandler::udpStop() {
 
-    DEBUGTRACE(INFO, "Stopping listening UDP on local port ", UDPport);
+    DEBUGTRACE(INFO, "Stopping listening UDP on local port %d", UDPport);
     udp.stop();
 
 }
@@ -337,9 +333,9 @@ bool WiFiHandler::udpRequest(IPAddress& address, unsigned int port, unsigned cha
 
     if (rtn1 == 0 || rtn2 == 0 || bytes_rtn == 0) {
         DEBUGTRACE(WARN, "UDP request failed");
-        DEBUGTRACE(WARN, "trtn1 = ", rtn1);
-        DEBUGTRACE(WARN, "trtn2 = ", rtn2);
-        DEBUGTRACE(WARN, "tbytes_rtn = ", bytes_rtn);
+        DEBUGTRACE(WARN, "trtn1 = %u", rtn1);
+        DEBUGTRACE(WARN, "trtn2 = %u", rtn2);
+        DEBUGTRACE(WARN, "tbytes_rtn = %u", bytes_rtn);
         return false;
     }
 

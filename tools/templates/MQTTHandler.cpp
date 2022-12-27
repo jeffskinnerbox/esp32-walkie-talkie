@@ -2,7 +2,7 @@
 /* -----------------------------------------------------------------------------
 
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.5
+Version:      0.9.7
 
 DESCRIPTION
 
@@ -46,7 +46,6 @@ CREATED BY
 //--------------------------- Global Scoped Variables --------------------------
 
 extern DeBug DB;            // declare object DB as external, it is instantiated in DeBug.cpp
-//extern MQTTHandler MQ;      // declare object MQ as external, and member of class MQTTHandler
 
 
 
@@ -82,7 +81,7 @@ int MQTTHandler::state(void) {
     int rtn;
 
     rtn = mqtt_client.state();
-    DEBUGTRACE(INFO, "Current state of the MQTT client = ", rtn);
+    DEBUGTRACE(INFO, "Current state of the MQTT client = %d", rtn);
 
     switch(rtn) {
         case -4:
@@ -124,7 +123,8 @@ int MQTTHandler::state(void) {
 }
 
 
-// called regularly to allow the client to process incoming messages and maintain its connection to the server
+// called regularly to allow the client to process incoming messages
+// and maintain its connection to the server
 // false = the client is no longer connected    true = the client is still connected
 boolean MQTTHandler::loop(void) {
     boolean rtn;
@@ -156,7 +156,7 @@ boolean MQTTHandler::reconnect(void) {
 
         // Create a random client ID
         String clientId = MQTTCLIENT;
-        DEBUGTRACE(INFO, "MQTT Client ID (clientId) = ", clientId);
+        DEBUGTRACE(INFO, "MQTT Client ID (clientId) = %s", clientId);
 
         // Attempt to connect to mqtt broker
         if (mqtt_client.connect((char *)clientId.c_str())) {
@@ -170,7 +170,7 @@ boolean MQTTHandler::reconnect(void) {
 
             rtn = true;
         } else {
-            DEBUGTRACE(WARN, "Reconnect failed,  return code = ", mqtt_client.state());
+            DEBUGTRACE(WARN, "Reconnect failed,  return code = %d", mqtt_client.state());
             rtn = false;
         }
     } else {
