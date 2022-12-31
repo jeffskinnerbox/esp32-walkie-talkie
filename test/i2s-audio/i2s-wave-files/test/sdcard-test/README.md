@@ -1,6 +1,6 @@
 <!--
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.0.0
+Version:      0.1.0
 -->
 
 
@@ -25,6 +25,7 @@ and plays the music via a head phone
 
 Sources:
 * [Interfacing Micro SD Card Module with Arduino][11]
+* [List files stored in SD Card connected to Arduino](https://www.tutorialspoint.com/list-files-stored-in-sd-card-connected-to-arduino)
 * [Building a Digital Music Player with I2S?! What is I2S! EB#45](https://www.youtube.com/watch?v=qNLvoSQCx60)
 * [ESP32 Sound - Working with I2S](https://www.youtube.com/watch?v=m-MPBjScNRk)
 * [I2S Sound Tutorial for ESP32](https://diyi0t.com/i2s-sound-tutorial-for-esp32/)

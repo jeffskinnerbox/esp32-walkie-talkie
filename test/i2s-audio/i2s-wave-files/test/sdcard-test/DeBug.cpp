@@ -1,7 +1,7 @@
 
 /* -----------------------------------------------------------------------------
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.6
+Version:      0.9.7
 
 DESCRIPTION:
 
@@ -37,7 +37,9 @@ CREATED BY:
 
 #define TDEBUG  false         // should we activate trace message printing for debugging
 
-#define BUFFER 50
+#define BUFFER1 25            // array size for small buffer
+#define BUFFER2 50            // array size for medium buffer
+#define BUFFER3 100           // array size for large buffer
 
 #ifdef ESP32                  // found in ESP32 libraries (~/.arduino15/packages/esp32/)
 #include <WiFi.h>
@@ -46,15 +48,7 @@ CREATED BY:
 #include <ESP8266WiFi.h>
 #endif
 
-
-// found in Arduino libraries (~/Arduino/libraries)
 #include <TelnetStream.h>
-
-// found in Arduino libraries (~/src/arduino/libraries)
-
-// found in Arduino Sketchbooks libraries (~/src/arduino/sketchbooks/libraries)
-
-// for trace messages/debugging, found in this directory
 #include "DeBug.h"
 
 
@@ -63,7 +57,7 @@ CREATED BY:
 // default constructors for the class
 DeBug::DeBug(void) {
 
-    serial = false;     // flag to turn on/off serial trace messages
+    serial = true;      // flag to turn on/off serial trace messages
     telnet = false;     // flag to turn on/off telnet trace messages
     prefix = false;     // flag to turn on/off prefix for trace messages
 
@@ -123,14 +117,15 @@ DeBug::~DeBug(void) {
 void DeBug::setLables(void) {
 
     // initialize trace message labels
-    label[INFO] =       "\e[1;32mINFO:    \e[m";           // bold green font
-    label[STAT] =       "\e[1;34mSTATUS:  \e[m";           // bold blue font
-    label[WARN] =       "\e[1;33mWARNING: \e[m";           // bold yellow font
-    label[ERROR] =      "\e[1;31mERROR:   \e[m";           // bold red font
-    label[FATAL] =      "\e[1;37m\e[41mFATAL:\e[m   ";     // bold White font on red background
-    label[NOOP] =       "\e[1;35mNO-OP:   \e[m";           // bold purple font
-    label[HEADING] =    "\e[1;37m\e[40m\n\rHEADING:\e[m";  // bold white font on black background
-    label[UNLABELED] =  "";                                // no labels
+    label[INFO] =       "\e[1;32mINFO:    \e[m";             // bold green font
+    label[STAT] =       "\e[1;34mSTATUS:  \e[m";             // bold blue font
+    label[WARN] =       "\e[1;33mWARNING: \e[m";             // bold yellow font
+    label[ERROR] =      "\e[1;31mERROR:   \e[m";             // bold red font
+    label[FATAL] =      "\e[1;37m\e[41mFATAL:\e[m   ";       // bold White font on red background
+    label[NOOP] =       "\e[1;35mNO-OP:   \e[m";             // bold purple font
+    label[HEADING] =    "\e[1;37m\e[40m\n\rHEADING:\e[m";    // bold white font on black background
+    label[NOTE] =       "\e[1;32m\e[47mNOTE:    \e[m";       // bold green font on white background
+    label[UNLABELED] =  "";                                  // no labels
 
 }
 
@@ -195,9 +190,9 @@ void DeBug::printStatus(void) {
 
     traceMsg(STAT, "Current state of DeBug object:");
 
-    traceMsg(STAT, "\tSerial trace message print = ", serial ? "true" : "false");
-    traceMsg(STAT, "\tTelnet trace message print = ", telnet ? "true" : "false");
-    traceMsg(STAT, "\tPrefix on trace message = ", prefix ? "true" : "false");
+    traceMsg(STAT, "\tSerial trace message print = %s", serial ? "true" : "false");
+    traceMsg(STAT, "\tTelnet trace message print = %s", telnet ? "true" : "false");
+    traceMsg(STAT, "\tPrefix on trace message = %s", prefix ? "true" : "false");
 
 }
 
@@ -213,9 +208,6 @@ void DeBug::SetupHandler(void) {
 
     printMsg("\n\n\r");   // make sure you have a clean line after reboot
 
-    //serialOnOff(true);
-    //telnetOnOff(true);
-    //prefixOnOff(false);
     OnOff(true, true, false);
 
 }
@@ -225,9 +217,6 @@ void DeBug::SetupHandler(bool ser, bool tel, bool pre) {
 
     printMsg("\n\n\r");   // make sure you have a clean line after reboot
 
-    //serialOnOff(ser);
-    //telnetOnOff(tel);
-    //prefixOnOff(pre);
     OnOff(ser, tel, pre);
 
 }
@@ -239,6 +228,7 @@ void DeBug::serialOnOff(bool flag) {
         traceMsg(STAT, "Serial DeBug printing is enabled");
     } else {
         traceMsg(STAT, "Serial DeBug printing is disabled");
+        Serial.flush();
     }
 
     serial = flag;                // update DeBug object's flag
@@ -260,6 +250,7 @@ void DeBug::telnetOnOff(bool flag) {
         TelnetStream.begin();
         traceMsg(STAT, "Telnet DeBug printing is enabled");
     } else {
+        TelnetStream.flush();
         traceMsg(STAT, "Telnet DeBug printing is disabled");
     }
 
@@ -280,6 +271,15 @@ void DeBug::prefixOnOff(bool flag) {
 }
 
 
+// flush the serial and telnet print queues to make sure everything is displayed
+void DeBug::flushQueue(void) {
+
+    if (serial) Serial.flush();
+    if (telnet) TelnetStream.flush();
+
+}
+
+
 void DeBug::OnOff(bool flag1, bool flag2, bool flag3) {
 
     serialOnOff(flag1);
@@ -292,42 +292,48 @@ void DeBug::OnOff(bool flag1, bool flag2, bool flag3) {
 void DeBug::printInfo(void) {
 
     uint32_t chipid = 0;
+    char buf[BUFFER1];
+    int rtn;
 
-    traceMsg(INFO, "Information concerning ESP & flash memory chips:");
+    rtn = snprintf(buf, BUFFER1, "%02X:%02X:%02X:%02X:%02X:%02X",
+        WiFi.macAddress()[0], WiFi.macAddress()[1], WiFi.macAddress()[2],
+        WiFi.macAddress()[3], WiFi.macAddress()[4], WiFi.macAddress()[5]);
+    if (rtn <= 0 && rtn >= BUFFER1) {
+        traceMsg(ERROR, "Buffer overflow condition in DeBug::traceMsg() - #5");
+    }
 
 #ifdef ESP32
 	for (int i = 0; i < 17; i = i + 8) {
 	  chipid |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
 	}
 
-    traceMsg(INFO, "\tESP32 IP Address = ", WiFi.localIP());
-    traceMsg(INFO, "\tESP32 MAC Address = ", WiFi.macAddress());
-    traceMsg(INFO, "\tESP32 DHCP Hostname = ", WiFi.getHostname());
-    traceMsg(INFO, "\tESP32 Chip ID (HEX) = %X\n\r", chipid, HEX);
-	traceMsg(INFO, "\tESP32 Chip Model = %s Rev %d\n\r", ESP.getChipModel(), ESP.getChipRevision());
-	traceMsg(INFO, "\tESP32 Chi Cores = %d cores\n\r", ESP.getChipCores(), DEC);
+    traceMsg(INFO, "Information concerning ESP & flash memory chips:");
+    traceMsg(INFO, "\tESP32 IP Address = %s",  WiFi.localIP());
+    traceMsg(INFO, "\tESP32 MAC Address = %s", buf);
+    traceMsg(INFO, "\tESP32 DHCP Hostname = %s", WiFi.getHostname());
+    traceMsg(INFO, "\tESP32 Chip ID (HEX) = %X", chipid);
+	traceMsg(INFO, "\tESP32 Chip Model = %s Rev %d", ESP.getChipModel(), ESP.getChipRevision());
+	traceMsg(INFO, "\tESP32 Chi Cores = %d cores", ESP.getChipCores());
 
-    //traceMsg(INFO, "\tFlash Chip Real Size (from chip): %d bits\n\r", ESP.getFlashChipRealSize(), DEC);
-    traceMsg(INFO, "\tFlash Chip Size (what compiler set): %d bits\n\r", ESP.getFlashChipSize(), DEC);
-    traceMsg(INFO, "\tFlash Chip Speed: %d Hz\n\r", ESP.getFlashChipSpeed(), DEC);
-    traceMsg(INFO, "\tFlash Chip Mode: %d\n\r", ESP.getFlashChipMode(), DEC);
+    traceMsg(INFO, "\tFlash Chip Size (what compiler set): %d bits", ESP.getFlashChipSize());
+    traceMsg(INFO, "\tFlash Chip Speed: %d Hz", ESP.getFlashChipSpeed());
+    traceMsg(INFO, "\tFlash Chip Mode: %d", ESP.getFlashChipMode());
 
-    traceMsg(INFO, "\tFree Heap Memory: %d bytes\n\r", ESP.getFreeHeap(), DEC);
-    //traceMsg(INFO, "\tHeap Fragmentation: %d%%\n\r", ESP.getHeapFragmentation(), DEC);  // 0% is clean, more than ~50% is not harmless
+    traceMsg(INFO, "\tFree Heap Memory: %d bytes", ESP.getFreeHeap());
 #else
-    traceMsg(INFO, "\tESP8266 IP Address = ", WiFi.localIP());
-    traceMsg(INFO, "\tESP8266 MAC Address = ", WiFi.macAddress());
-    traceMsg(INFO, "\tESP8266 DHCP Hostname = ", WiFi.hostname());
-    traceMsg(INFO, "\tESP8266 Chip ID (HEX) = %X\n\r", ESP.getChipId(), HEX);
+    traceMsg(INFO, "\tESP32 IP Address = %s",  WiFi.localIP());
+    traceMsg(INFO, "\tESP32 MAC Address = %s", buf);
+    traceMsg(INFO, "\tESP8266 DHCP Hostname = %s", WiFi.hostname());
+    traceMsg(INFO, "\tESP8266 Chip ID (HEX) = %X", ESP.getChipId());
 
-    traceMsg(INFO, "\tFlash Chip ID (HEX): %X\n\r", ESP.getFlashChipId(), HEX);
-    traceMsg(INFO, "\tFlash Chip Real Size (from chip): %d bits\n\r", ESP.getFlashChipRealSize(), DEC);
-    traceMsg(INFO, "\tFlash Chip Size (what compiler set): %d bits\n\r", ESP.getFlashChipSize(), DEC);
-    traceMsg(INFO, "\tFlash Chip Speed: %d Hz\n\r", ESP.getFlashChipSpeed(), DEC);
-    traceMsg(INFO, "\tFlash Chip Mode: %d\n\r", ESP.getFlashChipMode(), DEC);
+    traceMsg(INFO, "\tFlash Chip ID (HEX): %X", ESP.getFlashChipId());
+    traceMsg(INFO, "\tFlash Chip Real Size (from chip): %d bits", ESP.getFlashChipRealSize());
+    traceMsg(INFO, "\tFlash Chip Size (what compiler set): %d bits", ESP.getFlashChipSize());
+    traceMsg(INFO, "\tFlash Chip Speed: %d Hz", ESP.getFlashChipSpeed());
+    traceMsg(INFO, "\tFlash Chip Mode: %d", ESP.getFlashChipMode());
 
-    traceMsg(INFO, "\tFree Heap Memory: %d bytes\n\r", ESP.getFreeHeap(), DEC);
-    traceMsg(INFO, "\tHeap Fragmentation: %d%%\n\r", ESP.getHeapFragmentation(), DEC);  // 0% is clean, more than ~50% is not harmless
+    traceMsg(INFO, "\tFree Heap Memory: %d bytes", ESP.getFreeHeap());
+    traceMsg(INFO, "\tHeap Fragmentation: %d%%", ESP.getHeapFragmentation());  // 0% is clean, more than ~50% is not harmless
 #endif
 
 }
@@ -338,73 +344,6 @@ void DeBug::LoopHandler(void) {
     commandParser(TelnetStream.read());
     commandParser(Serial.read());
 
-/*    switch (TelnetStream.read()) {*/
-        /*case 'R':   // reboot the esp8266 / esp32*/
-            /*traceMsg(INFO, "Rebooting ...");*/
-            /*if (serial) Serial.flush();*/
-            /*if (serial) Serial.end();*/
-            /*if (telnet) TelnetStream.flush();*/
-            /*if (telnet) TelnetStream.stop();*/
-            /*delay(100);*/
-            /*ESP.restart();*/
-            /*break;*/
-        /*case 'C':   // drop telnet connection to esp8266 / esp32*/
-            /*traceMsg(INFO, "Dropping telnet connection ... bye bye");*/
-            /*Serial.flush();*/
-            /*TelnetStream.flush();*/
-            /*TelnetStream.stop();*/
-            /*break;*/
-        /*case 's':   // toggle on/off serial trace messages*/
-            /*traceMsg(INFO, "Toggle on/off serial trace messages");*/
-            /*serialOnOff();*/
-            /*break;*/
-        /*case 't':   // toggle on/off telnet trace messages*/
-            /*traceMsg(INFO, "Toggle on/off telnet trace messages");*/
-            /*telnetOnOff();*/
-            /*break;*/
-        /*case 'p':   // toggle on/off prefix for trace messages*/
-            /*traceMsg(INFO, "Toggle on/off prefix for trace messages");*/
-            /*prefixOnOff();*/
-            /*break;*/
-        /*default:*/
-            /*break;*/
-    /*}*/
-
-/*    switch (Serial.read()) {*/
-        /*case 'R':   // reboot the esp8266 / esp32*/
-            /*traceMsg(INFO, "Rebooting ...");*/
-            /*if (serial) Serial.flush();*/
-            /*if (serial) Serial.end();*/
-            /*if (telnet) TelnetStream.flush();*/
-            /*if (telnet) TelnetStream.stop();*/
-            /*delay(100);*/
-            /*ESP.restart();*/
-            /*break;*/
-        /*case 'C':   // drop telnet connection to esp8266 / esp32*/
-            /*traceMsg(INFO, "Dropping telnet connection ... bye bye");*/
-            /*Serial.flush();*/
-            /*TelnetStream.flush();*/
-            /*TelnetStream.stop();*/
-            /*break;*/
-        /*case 's':   // toggle on/off serial trace messages*/
-            /*traceMsg(INFO, "Toggle on/off serial trace messages");*/
-            /*serial = !serial;*/
-            /*printStatus();*/
-            /*break;*/
-        /*case 't':   // toggle on/off telnet trace messages*/
-            /*traceMsg(INFO, "Toggle on/off telnet trace messages");*/
-            /*telnet = !telnet;*/
-            /*printStatus();*/
-            /*break;*/
-        /*case 'p':   // toggle on/off prefix for trace messages*/
-            /*traceMsg(INFO, "Toggle on/off prefix for trace messages");*/
-            /*prefix = !prefix;*/
-            /*printStatus();*/
-            /*break;*/
-        /*default:*/
-            /*break;*/
-    /*}*/
-
 }
 
 
@@ -412,7 +351,7 @@ void DeBug::LoopHandler(void) {
 void DeBug::wifiScan(void) {
 
     unsigned char numSsid;
-    char buffer[BUFFER];
+    char buffer[BUFFER2];
     String st;
 
     traceMsg(HEADING, "---------------------------- Starting Network Scan -----------------------------");
@@ -424,8 +363,8 @@ void DeBug::wifiScan(void) {
     }
 
     // print the list of networks seen
-    traceMsg(INFO, "Total number of SSIDs found: ", numSsid);
-    snprintf(buffer, BUFFER, "\t%-20s\t%s\t%s", "SSID", "RSSI", "Encryp_Type");
+    traceMsg(INFO, "Total number of SSIDs found: %u", numSsid);
+    snprintf(buffer, BUFFER2, "\t%-20s\t%s\t%s", "SSID", "RSSI", "Encryp_Type");
     traceMsg(INFO, buffer);
 
     // print the name and characteristics of each network found
@@ -433,19 +372,19 @@ void DeBug::wifiScan(void) {
         st = WiFi.SSID(thisNet);     // convert from sting object to character string
         switch(WiFi.encryptionType(thisNet)) {
             case 2:
-                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "TKIP (WPA)");
+                snprintf(buffer, BUFFER2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "TKIP (WPA)");
                 break;
             case 4:
-                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "CCMP (WPA)");
+                snprintf(buffer, BUFFER2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "CCMP (WPA)");
                 break;
             case 5:
-                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "WEP");
+                snprintf(buffer, BUFFER2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "WEP");
                 break;
             case 7:
-                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "NONE");
+                snprintf(buffer, BUFFER2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "NONE");
                 break;
             case 8:
-                snprintf(buffer, BUFFER, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "AUTO");
+                snprintf(buffer, BUFFER2, "\t%-20s\t%d\t%s", st.c_str(), WiFi.RSSI(thisNet), "AUTO");
                 break;
             default:
                 traceMsg(ERROR, "Returned improper encryption type during WiFi scan.");
@@ -505,7 +444,7 @@ void DeBug::printMsg(T *str, U var, Z format) {
 }
 
 
-void DeBug::traceMsg(int lev, char *str) {
+bool DeBug::traceMsg(int lev, char *str) {
 
     if (prefix) location();
 
@@ -521,51 +460,97 @@ void DeBug::traceMsg(int lev, char *str) {
     } else
         printMsg(str);
 
+    return true;
+
 }
 
 
-template<typename T>
-void DeBug::traceMsg(int lev, char *str, T var) {
+/*------------------------------------------------------------------------------
+
+Description:
+    DEBUGTRACE is making use of snprintf.
+    snprintf stands for “String print”. Instead of printing on console,
+    it store output on character buffer which are specified in snprintf.
+
+    The size of the buffer should be large enough to contain the entire
+    resulting string (see snprintf for a safer version).
+
+    A terminating null character is automatically appended after the content written.
+
+Syntax:
+    int snprintf(char *buffer, int buffer_size, const char *format-specifier, ...);
+
+    A format specifier follows this prototype:
+    %[flags][width][.precision][length]specifier
+
+Return:
+    If successful, it returns the total number of characters written excluding
+    null-character (aka '\0') appended in the string, in case of failure a
+    negative number is returned.
+
+Sources:
+    Cplusplus.com - https://cplusplus.com/reference/cstdio/snprintf/
+    Variadic function templates in C++ - https://www.geeksforgeeks.org/variadic-function-templates-c/
+    Variadic templates in C++ - https://eli.thegreenplace.net/2014/variadic-templates-in-c/
+
+------------------------------------------------------------------------------*/
+
+
+// for printing of IPAdress type variables
+bool DeBug::traceMsg(int lev, const char *format, IPAddress ip) {
+
+    char buf2[BUFFER1];
+    int rtn;
+
+    // create printable string in buffer
+    rtn = snprintf(buf2, BUFFER1, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+
+    // check if you have an error - only when this returned value is non-negative
+    // and less than n, the string has been completely written
+    if (rtn <= 0 && rtn >= BUFFER1) {
+        traceMsg(ERROR, "Buffer overflow condition in DeBug::traceMsg() - #1");
+        return false;
+    }
+
+    rtn = traceMsg(lev, format, buf2);
+
+    return rtn;
+
+}
+
+
+// Variadic function Template that takes variable number of arguments and prints all of them.
+template<typename... Types>
+bool DeBug::traceMsg(int lev, const char *format, Types... var) {
+
+    char buf[BUFFER3];
+    int rtn;
+
+    // create printable string in buffer
+    rtn = snprintf(buf, BUFFER3, format, var...);
+
+    // check if you have an error - only when this returned value is non-negative
+    // and less than n, the string has been completely written
+    if (rtn <= 0 && rtn >= BUFFER3) {
+        traceMsg(ERROR, "Buffer overflow condition in DeBug::traceMsg() - #3");
+        return false;
+    }
 
     if (prefix) location();
 
     if (lev != UNLABELED) {
         if (serial) {
             Serial.print(label[lev]);
-            Serial.print(str);
-            Serial.println(var);
+            Serial.println(buf);
         }
         if (telnet) {
             TelnetStream.print(label[lev]);
-            TelnetStream.print(str);
-            TelnetStream.println(var);
+            TelnetStream.println(buf);
         }
-    } else {
-        printMsg(str);
-        printMsg(var);
-    }
+    } else
+        printMsg(buf);
 
-}
-
-
-template<typename T, typename U>
-void DeBug::traceMsg(int lev, char *str, T var, U format) {
-
-    if (prefix) location();
-
-    if (lev != UNLABELED) {
-        if (serial) {
-            Serial.print(label[lev]);
-            Serial.printf(str, var, format);
-        }
-        if (telnet) {
-            TelnetStream.print(label[lev]);
-            TelnetStream.printf(str, var, format);
-        }
-    } else {
-        printMsg(str);
-        printMsg(var, format);
-    }
+    return true;
 
 }
 
@@ -573,49 +558,30 @@ void DeBug::traceMsg(int lev, char *str, T var, U format) {
 
 // ----------------- Templatize Additionally Needed Functions ------------------
 
-template void DeBug::printMsg<int>(int);
 template void DeBug::printMsg<char*>(char*);
-template void DeBug::printMsg<wl_status_t>(wl_status_t);
 template void DeBug::printMsg<char const*>(char const*);
+template bool DeBug::traceMsg<char>(int, char const*, char);
+
+template void DeBug::printMsg<int>(int);
+template bool DeBug::traceMsg<int>(int, char const*, int);
 template void DeBug::printMsg<unsigned int, int>(unsigned int, int);
 
-template void DeBug::traceMsg<int>(int, char*, int);
-template void DeBug::traceMsg<bool>(int, char*, bool);
-template void DeBug::traceMsg<char*>(int, char*, char*);
-template void DeBug::traceMsg<short>(int, char*, short);
-template void DeBug::traceMsg<String>(int, char*, String);
-template void DeBug::traceMsg<int, int>(int, char*, int, int);
-template void DeBug::traceMsg<IPAddress>(int, char*, IPAddress);
-template void DeBug::traceMsg<char const*>(int, char*, char const*);
-template void DeBug::traceMsg<wl_status_t>(int, char*, wl_status_t);
-template void DeBug::traceMsg<unsigned int>(int, char*, unsigned int);
-template void DeBug::traceMsg<unsigned char>(int, char*, unsigned char);
-template void DeBug::traceMsg<unsigned long>(int, char*, unsigned long);
-template void DeBug::traceMsg<FlashMode_t, int>(int, char*, FlashMode_t, int);
-template void DeBug::traceMsg<int, char const*>(int, char*, int, char const*);
-template void DeBug::traceMsg<unsigned int, int>(int, char*, unsigned int, int);
-template void DeBug::traceMsg<unsigned char, int>(int, char*, unsigned char, int);
-template void DeBug::traceMsg<char*, char const*>(int, char*, char*, char const*);
-template void DeBug::traceMsg<char const*, char*>(int, char*, char const*, char*);
+template bool DeBug::traceMsg<long>(int, char const*, long);
+template bool DeBug::traceMsg<unsigned long>(int, char const*, unsigned long);
 
-template void DeBug::traceMsg<gpio_num_t>(int, char*, gpio_num_t);
-template void DeBug::traceMsg<i2s_port_t>(int, char*, i2s_port_t);
+template bool DeBug::traceMsg<float>(int, char const*, float);
+template bool DeBug::traceMsg<float*>(int, char const*, float*);
 
-#ifdef ESP32
-template void DeBug::traceMsg<StringSumHelper>(int, char*, StringSumHelper);
-#else
-#endif
+template void DeBug::printMsg<wl_status_t>(wl_status_t);
+template bool DeBug::traceMsg<wl_status_t>(int, char const*, wl_status_t);
 
-//template void DeBug::traceMsg(int, char*, T) [with T = char* (*)(const char*, int)];
-//template void DeBug::traceMsg<char* (*)(char const*, int)>(int, char*, char* (*)(char const*, int));
-template void DeBug::traceMsg<unsigned long long>(int, char*, unsigned long long);
-template void DeBug::traceMsg<unsigned long, int>(int, char*, unsigned long, int);
-template void DeBug::traceMsg<unsigned long long, int>(int, char*, unsigned long long, int);
-
+template bool DeBug::traceMsg<unsigned long long>(int, char const*, unsigned long long);
+template bool DeBug::traceMsg<char const*, unsigned int>(int, char const*, char const*, unsigned int);
+template bool DeBug::traceMsg<char const*, char const*>(int, char const*, char const*, char const*);
+template bool DeBug::traceMsg<char const*, int>(int, char const*, char const*, int);
 
 // --------------------------- Construct DeBug Object --------------------------
 
 // for trace messages/debugging, construct object DB as class DeBug
-//DeBug DB = DeBug(true, true, false);
-DeBug DB = DeBug();
+DeBug DB = DeBug(true, true, false);
 

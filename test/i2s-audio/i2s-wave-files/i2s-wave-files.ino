@@ -143,7 +143,7 @@ void setup() {
 
     DEBUGSETUP();                 // must be right after 'Serial.begin' and before any debug message
     DEBUGTRACE(HEADING, "------------------------------- Entered setup() --------------------------------");
-    DEBUGTRACE(INFO, "Application Version = ", version);
+    DEBUGTRACE(INFO, "Application Version = %s", version);
 
     SDCard = new CardHandler();
 

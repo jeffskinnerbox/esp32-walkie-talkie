@@ -1,7 +1,7 @@
 
 /* -----------------------------------------------------------------------------
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.9.6
+Version:      0.9.7
 
 DESCRIPTION:
     Debugging routings that print trace messages on serial port
@@ -47,10 +47,11 @@ CREATED BY:
 #define FATAL      4        // index into labels for printing fatal trace message
 #define NOOP       5        // index into labels for printing operation not implemented yet
 #define HEADING    6        // index into labels for printing a simple heading for organizing output
-#define UNLABELED  7        // index into labels for printing unformatted text
+#define NOTE       7        // index into labels for printing a note to help interpret what is happening
+#define UNLABELED  8        // index into labels for printing unformatted text
 
 #define LABEL_COLS 30       // max characters in labels
-#define LABEL_ROWS 8        // number of labels (see list in constructor below)
+#define LABEL_ROWS 10       // number of labels (see list in constructor below)
 
 
 class DeBug {
@@ -86,12 +87,14 @@ class DeBug {
     void printStatus(void);
     void printInfo(void);
     void location(void);
+    void flushQueue(void);
 
-    void traceMsg(int, char*);
+    bool traceMsg(int, char *);
+    bool traceMsg(int, const char *, IPAddress);
+    template<typename... Types> bool traceMsg(int, const char*, Types...);
+
     template<typename T> void printMsg(T);
-    template<typename T> void traceMsg(int, char*, T);
     template<typename T, typename U> void printMsg(T, U);
-    template<typename T, typename U> void traceMsg(int, char*, T, U);
     template<typename T, typename U, typename Z> void printMsg(T*, U, Z);
 
 };
@@ -102,14 +105,15 @@ class DeBug {
 
 #if TDEBUG
     #define DEBUGTRACE(lev, ...) DB.traceMsg(lev, __VA_ARGS__); // create a labeled trace message
-    #define DEBUGPRINT(...) DB.printMsg(__VA_ARGS__);  // print an unlabeled message
-    #define DEBUGON(s, t, p) DB.OnOff(s, t, p);        // turn on/off trace messages within the programs flow
-    #define DEBUGSTATUS() DB.printStatus();   // print information concerning status of DeBug object
-    #define DEBUGINFO(...) DB.printInfo();    // print information concerning ESP & flash memory chip
-    #define DEBUGWIFISCAN() DB.wifiScan();    // perfrom a single scan for nearby wifi networks
-    #define DEBUGSETUP() DB.SetupHandler();   // macro within the setup() function, must be after Serial.begin()
-    #define DEBUGLOOP() DB.LoopHandler();     // macro within the loop() function
-    #define DEBUGLOCATION() DB.location();    // NOT IMPLEMENTED YET
+    #define DEBUGPRINT(...) DB.printMsg(__VA_ARGS__);           // print an unlabeled message
+    #define DEBUGON(s, t, p) DB.OnOff(s, t, p);                 // turn on/off trace messages within the programs flow
+    #define DEBUGSTATUS() DB.printStatus();                     // print information concerning status of DeBug object
+    #define DEBUGINFO(...) DB.printInfo();                      // print information concerning ESP & flash memory chip
+    #define DEBUGWIFISCAN() DB.wifiScan();                      // perfrom a single scan for nearby wifi networks
+    #define DEBUGSETUP() DB.SetupHandler();                     // macro within the setup() function, must be after Serial.begin()
+    #define DEBUGLOOP() DB.LoopHandler();                       // macro within the loop() function
+    #define DEBUGLOCATION() DB.location();                      // NOT IMPLEMENTED YET
+    #define DEBUGFLUSHQ() DB.flushQueue();                      // flush the serial and telnet print queues
 #else
     #define DEBUGTRACE(lev, ...)
     #define DEBUGPRINT(...)
@@ -120,8 +124,8 @@ class DeBug {
     #define DEBUGSETUP()
     #define DEBUGLOOP()
     #define DEBUGLOCATION()
+    #define DEBUGFLUSHQ()
 #endif
 
 // -----------------------------------------------------------------------------
-
 

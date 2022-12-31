@@ -2,7 +2,7 @@
 /*------------------------------------------------------------------------------
 
 Maintainer:   jeffskinnerbox@yahoo.com / www.jeffskinnerbox.me
-Version:      0.0.1
+Version:      0.1.0
 
 DESCRIPTION:
     This a ESP32 test routine using the WiFiHandler, OTAHandler, and DeBug classes.
@@ -143,14 +143,68 @@ void setup() {
 
     DEBUGSETUP();                 // must be right after 'Serial.begin' and before any debug message
     DEBUGTRACE(HEADING, "------------------------------- Entered setup() --------------------------------");
-    DEBUGTRACE(INFO, "Application Version = ", version);
+    DEBUGTRACE(INFO, "Application Version = %s", version);
 
     SDCard = new CardHandler();
 
-    //SDCard->testFileIO("/test.txt");
-    DEBUGTRACE(INFO, "I made it to here - 1");
+    SDCard->deleteFile("/testdir_1/testdir_2/testdir_3");
+    SDCard->deleteFile("/testdir_1/testdir_2");
+    SDCard->deleteFile("/testdir_1");
+    SDCard->deleteFile("/testdir_0");
+    SDCard->deleteFile("/hello.txt");
+    SDCard->deleteFile("testdir_1");
+    SDCard->deleteFile("testdir_0");
+    SDCard->deleteFile("/foo.txt");
+    SDCard->deleteFile("/test-file.txt");
+    SDCard->deleteFile("/");
+    DEBUGTRACE(NOTE, "filesystem should be empty");
+    DEBUGTRACE(INFO, "----------------------------------------\n\r");
+    delay(3000);
+
+    SDCard->listDir("/", 5);
+    DEBUGTRACE(INFO, "----------------------------------------\n\r");
+    delay(3000);
+
+#ifdef XXX
+    SDCard->createDir("/testdir_0");
+    SDCard->listDir("/", 5);
+    DEBUGTRACE(INFO, "----------------------------------------\n\r");
+    delay(3000);
+
+    SDCard->createDir("/testdir_1");
+    SDCard->createDir("/testdir_1/testdir_2/testdir_3");
+    SDCard->createDir("/testdir_1/testdir_2");
+    SDCard->createDir("/testdir_1/testdir_2/testdir_3");
+    SDCard->listDir("/", 5);
+    DEBUGTRACE(INFO, "----------------------------------------\n\r");
+    delay(3000);
+
+    SDCard->deleteFile("/testdir_1/testdir_2");
+    SDCard->deleteFile("/testdir_1/testdir_2/");
+    SDCard->deleteFile("/testdir_1/testdir_2/testdir_3/");
+    SDCard->deleteFile("/testdir_1/testdir_2/tesdir_3");
+    SDCard->deleteFile("/testdir_1/testdir_2");
+    SDCard->listDir("/", 5);
+    DEBUGTRACE(INFO, "----------------------------------------\n\r");
+    delay(3000);
+
+    SDCard->renameFile("/testdir_1", "/testdir_A");
+    SDCard->deleteFile("/testdir_1");
+    SDCard->deleteFile("/testdir_A");
+    DEBUGTRACE(INFO, "----------------------------------------\n\r");
+    delay(3000);
+
+    SDCard->writeFile("/test-file.txt", "some random text\n\rfor this test file.");
+    SDCard->listDir("/", 3);
+    SDCard->writeFile("/hello.txt", "Hello ");
+    SDCard->listDir("/", 0);
+    SDCard->testFileIO("/test.txt");
     SDCard->deleteFile("/test.txt");
-    DEBUGTRACE(INFO, "I made it to here - 2");
+    SDCard->existsFile("/apple");
+    SDCard->existsFile("/apple/orange");
+#endif
+
+    delay(5000);
 
     DEBUGTRACE(HEADING, "-------------------------------- Exited setup() --------------------------------");
 
@@ -163,14 +217,15 @@ void loop() {
 
     DEBUGTRACE(INFO, "---------- I2S Wave File Test ----------");
 
-    SDCard->listDir("/", 0);
 #ifdef XXX
+    SDCard->listDir("/", 0);
     SDCard->createDir("/mydir");
     SDCard->listDir("/", 0);
     SDCard->removeDir("/mydir");
     SDCard->listDir("/", 2);
     SDCard->writeFile("/hello.txt", "Hello ");
     SDCard->readFile("/foo.txt");
+    DEBUGTRACE(INFO, "I make it to here -- #0");
     SDCard->appendFile("/hello.txt", "World!\n\r");
     SDCard->readFile("/hello.txt");
     SDCard->listDir("/", 3);

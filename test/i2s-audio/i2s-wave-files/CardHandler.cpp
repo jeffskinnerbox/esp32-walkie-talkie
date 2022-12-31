@@ -77,7 +77,7 @@ void CardHandler::errorHandler(int error_code, char *msg) {
     int i = 0;
     unsigned long tout;                      // time-out time
 
-    DEBUGTRACE(INFO, "In errorHandler() and error_code = %d\n\r", error_code, DEC);
+    DEBUGTRACE(INFO, "In errorHandler() and error_code = %d", error_code);
 
     switch(error_code) {
         case INIT_FAILED:
@@ -98,7 +98,7 @@ void CardHandler::errorHandler(int error_code, char *msg) {
             break;
         default:
             // nothing can be done so restart
-            DEBUGTRACE(ERROR, "Unknown error code in errorHandler: ", error_code);
+            DEBUGTRACE(ERROR, "Unknown error code in errorHandler: %i", error_code);
             DEBUGTRACE(FATAL, "Nothing can be done.  Doing an automatic restart.");
             Serial.flush();                  // make sure serial messages are posted
             ESP.restart();
@@ -110,7 +110,6 @@ void CardHandler::errorHandler(int error_code, char *msg) {
 bool CardHandler::initSDCard(void) {
 
     uint8_t cardType;
-    char buffer[BUF1_SIZE];
 
     // initialize spi communication protocol on the pins
     pinMode(CS_PIN, OUTPUT);      // the cs pin must be set to output
@@ -123,7 +122,7 @@ bool CardHandler::initSDCard(void) {
         return false;
     } else {
         cardType = SD.cardType();
-        DEBUGTRACE(INFO, "SD.cardType = %d\n\r", cardType, DEC);
+        DEBUGTRACE(INFO, "SD.cardType = %d", cardType);
     }
 
     switch(cardType) {
@@ -145,11 +144,8 @@ bool CardHandler::initSDCard(void) {
             return false;
     }
 
-    sprintf(buffer, "SD Card size: %lluMB", SD.cardSize() / bytes_per_megabytes);
-    DEBUGTRACE(INFO, buffer);
-
-    sprintf(buffer, "SD Card used space: %lluMB", SD.usedBytes() / bytes_per_megabytes);
-    DEBUGTRACE(INFO, buffer);
+    DEBUGTRACE(INFO, "SD Card size: %lluMB", SD.cardSize() / bytes_per_megabytes);
+    DEBUGTRACE(INFO, "SD Card used space: %lluMB", SD.usedBytes() / bytes_per_megabytes);
 
     return true;
 
