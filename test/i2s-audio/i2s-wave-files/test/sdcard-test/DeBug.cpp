@@ -298,7 +298,7 @@ void DeBug::printInfo(void) {
     rtn = snprintf(buf, BUFFER1, "%02X:%02X:%02X:%02X:%02X:%02X",
         WiFi.macAddress()[0], WiFi.macAddress()[1], WiFi.macAddress()[2],
         WiFi.macAddress()[3], WiFi.macAddress()[4], WiFi.macAddress()[5]);
-    if (rtn <= 0 && rtn >= BUFFER1) {
+    if (rtn <= 0 || rtn >= BUFFER1) {
         traceMsg(ERROR, "Buffer overflow condition in DeBug::traceMsg() - #5");
     }
 
@@ -506,8 +506,8 @@ bool DeBug::traceMsg(int lev, const char *format, IPAddress ip) {
     rtn = snprintf(buf2, BUFFER1, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 
     // check if you have an error - only when this returned value is non-negative
-    // and less than n, the string has been completely written
-    if (rtn <= 0 && rtn >= BUFFER1) {
+    // and less than n, the string has been completely written correctly
+    if (rtn <= 0 || rtn >= BUFFER1) {
         traceMsg(ERROR, "Buffer overflow condition in DeBug::traceMsg() - #1");
         return false;
     }
@@ -531,7 +531,7 @@ bool DeBug::traceMsg(int lev, const char *format, Types... var) {
 
     // check if you have an error - only when this returned value is non-negative
     // and less than n, the string has been completely written
-    if (rtn <= 0 && rtn >= BUFFER3) {
+    if (rtn <= 0 || rtn >= BUFFER3) {
         traceMsg(ERROR, "Buffer overflow condition in DeBug::traceMsg() - #3");
         return false;
     }

@@ -70,7 +70,8 @@ class CardHandler {
 #else
     void unMount();
     bool existsFile(const char *);
-    bool listDir(const char *, uint8_t);
+    //bool listDir(const char *, uint8_t);
+    bool listDir(const char *);
     bool createDir(const char *);
     bool removeDir(const char *);
     bool writeFile(const char *, const char *);

@@ -47,10 +47,11 @@ CREATED BY:
 #define FATAL      4        // index into labels for printing fatal trace message
 #define NOOP       5        // index into labels for printing operation not implemented yet
 #define HEADING    6        // index into labels for printing a simple heading for organizing output
-#define UNLABELED  7        // index into labels for printing unformatted text
+#define NOTE       7        // index into labels for printing a note to help interpret what is happening
+#define UNLABELED  8        // index into labels for printing unformatted text
 
 #define LABEL_COLS 30       // max characters in labels
-#define LABEL_ROWS 8        // number of labels (see list in constructor below)
+#define LABEL_ROWS 10       // number of labels (see list in constructor below)
 
 
 class DeBug {
@@ -86,6 +87,7 @@ class DeBug {
     void printStatus(void);
     void printInfo(void);
     void location(void);
+    void flushQueue(void);
 
     bool traceMsg(int, char *);
     bool traceMsg(int, const char *, IPAddress);
@@ -111,6 +113,7 @@ class DeBug {
     #define DEBUGSETUP() DB.SetupHandler();                     // macro within the setup() function, must be after Serial.begin()
     #define DEBUGLOOP() DB.LoopHandler();                       // macro within the loop() function
     #define DEBUGLOCATION() DB.location();                      // NOT IMPLEMENTED YET
+    #define DEBUGFLUSHQ() DB.flushQueue();                      // flush the serial and telnet print queues
 #else
     #define DEBUGTRACE(lev, ...)
     #define DEBUGPRINT(...)
@@ -121,6 +124,7 @@ class DeBug {
     #define DEBUGSETUP()
     #define DEBUGLOOP()
     #define DEBUGLOCATION()
+    #define DEBUGFLUSHQ()
 #endif
 
 // -----------------------------------------------------------------------------

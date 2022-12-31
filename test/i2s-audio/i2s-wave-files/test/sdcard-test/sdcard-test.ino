@@ -161,13 +161,13 @@ void setup() {
     DEBUGTRACE(INFO, "----------------------------------------\n\r");
     delay(3000);
 
-    SDCard->listDir("/", 5);
+    SDCard->listDir("/");
     DEBUGTRACE(INFO, "----------------------------------------\n\r");
     delay(3000);
 
 #ifdef XXX
     SDCard->createDir("/testdir_0");
-    SDCard->listDir("/", 5);
+    SDCard->listDir("/");
     DEBUGTRACE(INFO, "----------------------------------------\n\r");
     delay(3000);
 
@@ -175,7 +175,7 @@ void setup() {
     SDCard->createDir("/testdir_1/testdir_2/testdir_3");
     SDCard->createDir("/testdir_1/testdir_2");
     SDCard->createDir("/testdir_1/testdir_2/testdir_3");
-    SDCard->listDir("/", 5);
+    SDCard->listDir("/");
     DEBUGTRACE(INFO, "----------------------------------------\n\r");
     delay(3000);
 
@@ -184,7 +184,7 @@ void setup() {
     SDCard->deleteFile("/testdir_1/testdir_2/testdir_3/");
     SDCard->deleteFile("/testdir_1/testdir_2/tesdir_3");
     SDCard->deleteFile("/testdir_1/testdir_2");
-    SDCard->listDir("/", 5);
+    SDCard->listDir("/");
     DEBUGTRACE(INFO, "----------------------------------------\n\r");
     delay(3000);
 
@@ -195,9 +195,9 @@ void setup() {
     delay(3000);
 
     SDCard->writeFile("/test-file.txt", "some random text\n\rfor this test file.");
-    SDCard->listDir("/", 3);
+    SDCard->listDir("/");
     SDCard->writeFile("/hello.txt", "Hello ");
-    SDCard->listDir("/", 0);
+    SDCard->listDir("/");
     SDCard->testFileIO("/test.txt");
     SDCard->deleteFile("/test.txt");
     SDCard->existsFile("/apple");
@@ -218,17 +218,17 @@ void loop() {
     DEBUGTRACE(INFO, "---------- I2S Wave File Test ----------");
 
 #ifdef XXX
-    SDCard->listDir("/", 0);
+    SDCard->listDir("/");
     SDCard->createDir("/mydir");
-    SDCard->listDir("/", 0);
+    SDCard->listDir("/");
     SDCard->removeDir("/mydir");
-    SDCard->listDir("/", 2);
+    SDCard->listDir("/");
     SDCard->writeFile("/hello.txt", "Hello ");
     SDCard->readFile("/foo.txt");
     DEBUGTRACE(INFO, "I make it to here -- #0");
     SDCard->appendFile("/hello.txt", "World!\n\r");
     SDCard->readFile("/hello.txt");
-    SDCard->listDir("/", 3);
+    SDCard->listDir("/");
     SDCard->deleteFile("/foo.txt");
     SDCard->renameFile("/hello.txt", "/foo.txt");
 #endif

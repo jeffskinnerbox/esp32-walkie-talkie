@@ -14,7 +14,9 @@ CREATED BY:
 
 #define TDEBUG  true       // activate trace message printing for debugging
 
-# define INIT_FAILED 1
+# define INIT_FAILED  1
+# define BUF_OVERFLOW 2
+
 # define BUFSIZE 512
 
 // arduino and esp include files
@@ -154,6 +156,9 @@ void CardHandler::errorHandler(int error_code, char *msg) {
             Serial.flush();                  // make sure serial messages are posted
             ESP.restart();
             break;
+        case BUF_OVERFLOW:
+            DEBUGTRACE(ERROR, msg);
+            break;
         default:
             // nothing can be done so restart
             DEBUGTRACE(ERROR, "Unknown error code in errorHandler: %i", error_code);
@@ -221,14 +226,14 @@ void CardHandler::unMount() {
 
 /*}*/
 
-bool CardHandler::listDir(const char *path, uint8_t levels) {
+//bool CardHandler::listDir(const char *path, uint8_t levels) {
+bool CardHandler::listDir(const char *path) {
 
     File cur_dir = SD.open(path, FILE_READ);
 
     DEBUGTRACE(INFO, "Listing for directory: %s", path);
 
     if (!cur_dir) {
-    //if (cur_dir == false) {
         DEBUGTRACE(WARN, "Failed to open directory: %s", path);
         return false;
     }
@@ -243,17 +248,19 @@ bool CardHandler::listDir(const char *path, uint8_t levels) {
     /*Serial.println("/");*/
     /*descendDir(file, levels);*/
 
-    //descendDir(cur_dir, levels);
     descendDir(cur_dir, 0);
 
     return true;
 }
 
 
-void CardHandler::descendDir(File dir, int numIndents) {
+// recursively go down the directory structure and print relevant information
+void CardHandler::descendDir(File dir, int level) {
 
+    int rtn;
     const char *initial_indent = "         ";
     const char *step_indent = "   ";
+    char buffer1[BUF2_SIZE], buffer2[BUF3_SIZE];
 
     while (true) {
         File entry = dir.openNextFile();
@@ -261,19 +268,39 @@ void CardHandler::descendDir(File dir, int numIndents) {
             // no more files in this directory
             break;
         }
-        Serial.print(initial_indent);
-        for (uint8_t i = 0; i < numIndents; i++) {
-            Serial.print(step_indent);
+        //Serial.print(initial_indent);
+        rtn = snprintf(buffer1, BUF2_SIZE, "%s", initial_indent);
+
+        // check if you have an error - only when this returned value is non-negative
+        // and less than n, the string has been completely written correctly
+        if (rtn <= 0 || rtn >= BUF2_SIZE) {
+            errorHandler(BUF_OVERFLOW, "Buffer overflow condition in CardHandler::desendDir() - #1");
         }
-            Serial.print(entry.name());
-            if (entry.isDirectory()) {
-                Serial.println("/");
-                descendDir(entry, numIndents + 1);
-            } else {
-                // files have sizes, directories do not
-                Serial.print(step_indent);
-                Serial.println(entry.size(), DEC);
+
+        // creating the indentation required for this directory hierarchy
+        for (uint8_t i = 0; i < level; i++) {
+            //Serial.print(step_indent);
+            strcat(buffer1, step_indent);
+        }
+        //Serial.print(entry.name());
+        strcat (buffer1, entry.name());
+
+        // print file or directory name, include with files their sizes
+        if (entry.isDirectory()) {
+            //Serial.println("/");
+            DEBUGPRINT(strcat(buffer1, "/\n\r"));   // if a directory, print its name
+            descendDir(entry, level + 1);           // descend into the directory
+        } else {
+            //Serial.print(step_indent);
+            //Serial.println(entry.size(), DEC);
+            rtn = snprintf(buffer2, BUF3_SIZE, "%s    SIZE: %i Bytes\n\r", buffer1, entry.size());
+            // check if you have an error - only when this returned value is non-negative
+            // and less than n, the string has been completely written correctly
+            if (rtn <= 0 || rtn >= BUF3_SIZE) {
+                errorHandler(BUF_OVERFLOW, "Buffer overflow condition in CardHandler::desendDir() - #2");
             }
+            DEBUGPRINT(buffer2);
+        }
         entry.close();
     }
 
