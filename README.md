@@ -13,6 +13,7 @@ Version:      0.0.0
 
 
 # More Walkie Talkie examples
+* [ESP32 compact board integrates Walkie-Talkie module](https://linuxgizmos.com/esp32-compact-board-integrates-walkie-talkie-module/)
 * [ESP32 | Walkie-Talkie, Half-duplex communication based on WebSocket](https://www.youtube.com/watch?v=kw30vLdrGE8&list=PLnq7JUnBumAyTTTpzvRdsLKR8ls3sAtHW&index=11)
 * [ESP32 | Walkie-Talkie based on Node.js Server for multi-clients (ft. PCM speaker)](https://www.youtube.com/watch?v=vq7mPgecGKA&list=PLnq7JUnBumAyTTTpzvRdsLKR8ls3sAtHW&index=13)
 
