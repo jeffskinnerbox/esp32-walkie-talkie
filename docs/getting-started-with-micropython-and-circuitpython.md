@@ -1,0 +1,1 @@
+/home/jeff/blogging/content/ideas/getting-started-with-micropython-and-circuitpython.md

@@ -61,8 +61,8 @@ nosetests.xml
 coverage.xml
 
 ### Include files containing secrets
-secret.h
-secrets.h
+secret*
+secrets*
 
 ### Logs & Databases ###
 *.log
