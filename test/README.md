@@ -23,8 +23,16 @@ In CircuitPython, there are three different techniques to output audio:
     * [We don't need a DAC - ESP32 PDM Audio](https://www.youtube.com/watch?v=oZ39VCUvKjw)
     * [atomic14/esp32-pdm-audio](https://github.com/atomic14/esp32-pdm-audio)
 
-# What is WAV vs FLAC vs AIFF vs MP3 vs AAC vs WMA?
+# Audio File Formats
+There are [many audio file formats][22].
+
+## What is WAV vs FLAC vs AIFF vs MP3 vs AAC vs WMA?
 **Lossless Formats** - Audio is encoded with the objective of not making any changes to the fidelity of the sound
+* [Raw Audio Format][20] A raw audio file is any file containing un-[containerized][21] and uncompressed audio.
+The data is stored as raw pulse-code modulation (PCM) values without any metadata header information
+(such as sampling rate, bit depth, endian, or number of channels).
+Raw files can have a wide range of file extensions, common ones being `.raw`, `.pcm`, or `.sam`.
+They can also have no extension.
 * [Waveform Audio File Format (WAV)][14] is a Microsoft & IBM creation to replace the simple (and unpleasant) beeping noises used in early computers to notify the user.
 WAV files aren’t compressed when digitally encoded, meaning the original audio elements stay in the file.
 Audio editors describe WAV files as “lossless” because you don’t lose any part of your audio.
@@ -45,7 +53,7 @@ Disadvantages: loss of some sound quality (minor), audio distortion (aka "compre
 Sources:
 * [WAV vs MP3: What's the Difference & Which Is Better for Podcasters](https://riverside.fm/blog/wav-vs-mp3)
 
-# What is PWM vs PDM vs SDM?
+## What is PWM vs PDM vs SDM?
 Whats the difference between the PWM / PDM / SDM modulation schemes used for audio applications?
 
 * A [Pulse-Width Modulation (PWM)][10] circuit is often used as a simple digital to analog converter
@@ -89,5 +97,15 @@ Sources:
 [17]:https://docs.fileformat.com/audio/mp3/
 [18]:https://docs.fileformat.com/audio/aac/
 [19]:https://docs.fileformat.com/audio/wma/
-[20]:
+[20]:https://web.archive.org/web/20160525083851/http://www.fmtz.com/misc/raw-audio-file-formats
+[21]:https://en.wikipedia.org/wiki/Container_format
+[22]:https://en.wikipedia.org/wiki/Audio_file_format
+[23]:
+[24]:
+[25]:
+[26]:
+[27]:
+[28]:
+[29]:
+[30]:
 

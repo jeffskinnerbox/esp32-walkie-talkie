@@ -82,6 +82,13 @@ which has a generious free pricing plan is user-friendly,
 and plenty of good features for all kinds of tasks like writing, coding,
 and a [broad set of assistants][16].
 
+# ESP32-S3 Doesn't Have a DAC?!
+ESP32-S3 doesn’t have a Sigital-to-Analog Converter (DAC),
+so what are you to do with digital audio?
+Of course you could use I2S but what if my sources isn't I2S, like a WAV file?
+[SubStack's atomic14][22] (Chris Greening) says this isn't a problem since we can just
+treat the audio bit steam as a Pulse Density Modulated (PDM) audio stream.
+
 
 
 [01]:https://hackaday.com/2021/04/07/an-esp32-walkie-talkie-for-those-spy-radio-moments/
@@ -105,7 +112,7 @@ and a [broad set of assistants][16].
 [19]:https://esp32s3.com/
 [20]:https://learn.adafruit.com/introducing-adafruit-stemma-qt/what-is-stemma-qt
 [21]:https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/i2s.html
-[22]:
+[22]:https://atomic14.substack.com/p/esp32-s3-no-dac
 [23]:
 [24]:
 [25]:
